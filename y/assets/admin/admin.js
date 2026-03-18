@@ -3184,7 +3184,8 @@ window.renderReview = () => {
             studentGroups[key].offStageCount++;
             // Track Dept + Item count for Off Stage
             if (r.program && r.department) {
-                const deptItemKey = `${r.department}|${r.program}`;
+                const mappedDept = getMappedDepartment(r.department);
+                const deptItemKey = `${mappedDept || r.department}|${r.program}`;
                 deptItemCounts[deptItemKey] = (deptItemCounts[deptItemKey] || 0) + 1;
             }
         } else if (cat === "on stage" && type === "individual") {
@@ -3386,15 +3387,12 @@ const updateReviewCount = () => {
 
 const getMappedDepartment = (deptName) => {
     if (!deptName) return "";
-    if (DEPARTMENTS.includes(deptName)) return deptName;
-    for (const [mainDept, courses] of Object.entries(DEPT_COURSES)) {
-        if (courses.includes(deptName)) return mainDept;
+    const lower = deptName.toLowerCase().replace(/\./g, '').trim();
+    if (DEPARTMENTS.some(d => d.toLowerCase().replace(/\./g, '').trim() === lower)) {
+        return DEPARTMENTS.find(d => d.toLowerCase().replace(/\./g, '').trim() === lower);
     }
-    const lower = deptName.toLowerCase().trim();
-    const matchedKey = DEPARTMENTS.find(d => d.toLowerCase() === lower);
-    if (matchedKey) return matchedKey;
     for (const [mainDept, courses] of Object.entries(DEPT_COURSES)) {
-        if (courses.some(c => c.toLowerCase().trim() === lower)) return mainDept;
+        if (courses.some(c => c.toLowerCase().replace(/\./g, '').trim() === lower)) return mainDept;
     }
     return deptName;
 };

@@ -1004,6 +1004,97 @@
           throw new Error("Please fill all required fields.");
         }
 
+        // --- Registration Limit Checks ---
+        const cat = (formData.category || "").trim().toLowerCase();
+        const prog = (formData.program || "").trim();
+        const dept = (formData.department || "").trim();
+        const roll = (formData.rollNumber || "").trim();
+        const year = (formData.year || "").trim();
+
+        // Identify parent department to check limits across all its courses
+        let mainDept = linkData.department;
+        const normalizedDept = dept.toLowerCase().replace(/\./g, '').trim();
+        for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
+          if (mDept.toLowerCase().replace(/\./g, '').trim() === normalizedDept || courses.some(c => c.toLowerCase().replace(/\./g, '').trim() === normalizedDept)) {
+            mainDept = mDept;
+            break;
+          }
+        }
+
+        // Normalize Academic Year (e.g. "2025 - 26" -> "2025-26")
+        const regYear = systemYear.replace(/\s/g, ''); 
+
+        // Fetch ALL registrations/pending for this academic year to prevent bypass via naming variations
+        const qAllReg = query(collection(db, "registrations"), where("academicYear", "==", regYear));
+        const qAllPend = query(collection(db, "pending_registrations"), where("academicYear", "==", regYear), where("status", "==", "pending"));
+        
+        let snapAllReg, snapAllPend;
+        try {
+          const regPromise = getDocs(qAllReg);
+          const pendPromise = getDocs(qAllPend).catch(e => {
+              console.warn("Pending check skipped.");
+              return { size: 0, docs: [] };
+          });
+          [snapAllReg, snapAllPend] = await Promise.all([regPromise, pendPromise]);
+        } catch (e) {
+          console.error("Query failed:", e);
+          throw new Error("Verification failed. Please try again.");
+        }
+
+        const allDocsData = [...snapAllReg.docs, ...(snapAllPend?.docs || [])].map(d => d.data());
+
+        // 1. Department Limit for Off-Stage (Max 3 per Department per Program)
+        if (cat === "off stage") {
+          const targetProg = prog.toLowerCase().trim();
+          const activeRegCount = allDocsData.filter(d => {
+            if (d.isCanceled || d.isDeleted) return false;
+            if ((d.program || "").toLowerCase().trim() !== targetProg) return false;
+            
+            let dMainDept = (d.department || "").trim();
+            const dNorm = dMainDept.toLowerCase().replace(/\./g, '').trim();
+            for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
+              if (mDept.toLowerCase().replace(/\./g, '').trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, '').trim() === dNorm)) {
+                dMainDept = mDept;
+                break;
+              }
+            }
+            return dMainDept === mainDept;
+          }).length;
+
+          if (activeRegCount >= 3) {
+            throw new Error(`Limit reached! The ${mainDept} already has ${activeRegCount} registrations for "${formData.program}". Max 3 allowed per department.`);
+          }
+        }
+
+        // 2. Individual Student Limits (Max 3 Off-Stage, Max 3 On-Stage Individual)
+        if (regType === "individual") {
+          let studentOffStageCount = 0;
+          let studentOnStageIndCount = 0;
+          const sRoll = roll.toLowerCase();
+          const sYear = year.toLowerCase();
+
+          allDocsData.forEach(d => {
+            if (d.isCanceled || d.isDeleted) return;
+            
+            // Robust student matching
+            const dRoll = (d.rollNumber || "").trim().toLowerCase();
+            const dYear = (d.year || "").trim().toLowerCase();
+            if (dRoll !== sRoll || dYear !== sYear) return;
+
+            const dCat = (d.category || "").trim().toLowerCase();
+            const dType = (d.regType || "Individual").trim().toLowerCase();
+            if (dCat === "off stage") studentOffStageCount++;
+            else if (dCat === "on stage" && dType === "individual") studentOnStageIndCount++;
+          });
+
+          if (cat === "off stage" && studentOffStageCount >= 3) {
+            throw new Error(`Limit reached! You have already registered for ${studentOffStageCount} Off-Stage events. Max 3 allowed.`);
+          }
+          if (cat === "on stage" && regType === "individual" && studentOnStageIndCount >= 3) {
+            throw new Error(`Limit reached! You have already registered for ${studentOnStageIndCount} On-Stage Individual events. Max 3 allowed.`);
+          }
+        }
+
         await addDoc(collection(db, "pending_registrations"), formData);
 
         // Show Success
