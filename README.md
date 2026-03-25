@@ -1,6 +1,6 @@
-# Union Arts PRC
+# Arts Management System Pazhassiraja College
 
-A professional management portal and appeal system for the Union Arts Arts Festival, built with a modern glassmorphic aesthetic and real-time Firebase backend.
+A professional management portal and appeal system for the Union Arts Festival, built with a modern glassmorphic aesthetic and real-time Firebase backend.
 
 ## 🚀 Features
 
