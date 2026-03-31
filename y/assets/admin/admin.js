@@ -160,6 +160,7 @@ const noDataMsg = document.getElementById('no-data-msg');
 let allRegistrations = [];
 let leaderboardScores = {};
 let programDates = {};
+let pendingResults = [];
 
 let currentView = 'registrations';
 let currentRegTab = 'On Stage';
@@ -942,7 +943,7 @@ const switchView = (viewName) => {
     });
 
     // Show/Hide Panels
-    const panels = ['registrations', 'leaderboard', 'whitelist', 'settings', 'review', 'dates', 'deleted', 'chest', 'appeals', 'certificates'];
+    const panels = ['registrations', 'leaderboard', 'whitelist', 'settings', 'review', 'dates', 'deleted', 'chest', 'appeals', 'certificates', 'results-review'];
     panels.forEach(p => {
         const el = document.getElementById(`panel-${p}`);
         if (el) {
@@ -967,7 +968,8 @@ const switchView = (viewName) => {
         deleted: 'Recently Deleted',
         chest: 'Chest Numbers',
         appeals: 'Participant Appeals',
-        certificates: 'Certificate Generation'
+        certificates: 'Certificate Generation',
+        'results-review': 'Review Results Queue'
 
     };
     document.getElementById('current-view-title').textContent = titles[viewName] || 'Dashboard';
@@ -986,6 +988,7 @@ const switchView = (viewName) => {
     if (viewName === 'chest') refreshChestPanel();
     if (viewName === 'appeals') fetchAppeals();
     if (viewName === 'certificates') fetchCertificates();
+    if (viewName === 'results-review') renderResultsReview();
 
 };
 
@@ -4312,3 +4315,152 @@ window.downloadAllGroupCerts = async () => {
         }
     }
 };
+// --- Results Review logic ---
+
+let resultsListener = null;
+const initResultsListener = () => {
+    if (resultsListener) return;
+    log("Initializing real-time results listener...");
+    const q = query(
+        collection(db, "pending_results"),
+        where("academicYear", "==", systemYear),
+        where("status", "==", "pending")
+    );
+
+    resultsListener = onSnapshot(q, (snapshot) => {
+        pendingResults = [];
+        snapshot.forEach(doc => {
+            pendingResults.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Update Badge
+        const badge = document.getElementById('results-review-count-badge');
+        if (badge) {
+            badge.textContent = pendingResults.length;
+            badge.classList.toggle('hidden', pendingResults.length === 0);
+        }
+
+        if (currentView === 'results-review') renderResultsReview();
+    }, (error) => {
+        log("Results listener error:", error);
+    });
+};
+
+window.renderResultsReview = () => {
+    const tbody = document.getElementById('results-review-body');
+    const noMsg = document.getElementById('no-results-review-msg');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    
+    if (pendingResults.length === 0) {
+        if (noMsg) noMsg.classList.remove('hidden');
+        return;
+    }
+
+    if (noMsg) noMsg.classList.add('hidden');
+
+    pendingResults.forEach(res => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div style="font-weight: 600;">${res.studentName}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${res.programName}</div>
+            </td>
+            <td><span class="badge badge-dept">${res.department.replace('Dep. of ', '')}</span></td>
+            <td>
+                <span class="badge" style="background: rgba(251, 191, 36, 0.1); color: var(--gold);">
+                    ${res.position}${isNaN(res.position) ? '' : ' Rank'}
+                </span>
+                ${res.marks ? `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">${res.marks}</div>` : ''}
+            </td>
+            <td>
+                <div style="font-size: 0.8rem;">${res.submittedBy.split('@')[0]}</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">${new Date(res.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            </td>
+            <td>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button onclick="acceptResult('${res.id}')" class="btn-tab active" style="padding: 0.4rem 0.8rem; background: var(--success);">Accept</button>
+                    <button onclick="rejectResult('${res.id}')" class="btn-tab" style="padding: 0.4rem 0.8rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">Decline</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+};
+
+window.acceptResult = async (resultId) => {
+    const res = pendingResults.find(r => r.id === resultId);
+    if (!res) return;
+
+    if (!confirm(`Are you sure you want to accept this result for ${res.studentName}?`)) return;
+
+    try {
+        log(`Accepting result: ${res.studentName} - ${res.position}`);
+        
+        // Calculate Points
+        let points = 0;
+        if (res.position === '1') points = 5;
+        else if (res.position === '2') points = 3;
+        else if (res.position === '3') points = 1;
+
+        // 1. Update Registration Record
+        const regDocRef = doc(db, "registrations", res.participantId);
+        await updateDoc(regDocRef, {
+            rank: res.position,
+            resultSubmitted: true,
+            resultAcceptedAt: new Date().toISOString()
+        });
+
+        // 2. Update Leaderboard (if points > 0)
+        if (points > 0) {
+            const lbId = `${res.department.replace(/\s+/g, '_')}_${systemYear}`;
+            const lbRef = doc(db, "leaderboard", lbId);
+            await setDoc(lbRef, {
+                department: res.department,
+                score: increment(points),
+                academicYear: systemYear,
+                lastUpdated: new Date().toISOString()
+            }, { merge: true });
+        }
+
+        // 3. Log to score_logs (for certificates)
+        await addDoc(collection(db, "score_logs"), {
+            participantId: res.participantId,
+            participantName: res.studentName,
+            department: res.department,
+            itemName: res.programName,
+            position: res.position === '1' ? '1st' : (res.position === '2' ? '2nd' : (res.position === '3' ? '3rd' : res.position)),
+            points: points,
+            academicYear: systemYear,
+            timestamp: new Date().toISOString()
+        });
+
+        // 4. Delete from Pending Results
+        await deleteDoc(doc(db, "pending_results", resultId));
+
+        log("Result accepted and processed successfully.");
+    } catch (error) {
+        log("Error accepting result:", error);
+        alert("Failed to process result: " + error.message);
+    }
+};
+
+window.rejectResult = async (resultId) => {
+    if (!confirm("Are you sure you want to decline this result submission?")) return;
+    try {
+        await deleteDoc(doc(db, "pending_results", resultId));
+        log("Result submission declined.");
+    } catch (error) {
+        log("Error declining result:", error);
+        alert("Failed to decline: " + error.message);
+    }
+};
+
+// Start listener when system is ready
+const originalRefreshAll = window.refreshAll;
+window.refreshAll = function() {
+    if (typeof originalRefreshAll === 'function') originalRefreshAll();
+    initResultsListener();
+};
+initResultsListener();

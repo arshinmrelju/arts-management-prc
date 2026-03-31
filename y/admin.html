@@ -141,6 +141,11 @@
                     <i class="fas fa-certificate"></i>
                     Certificates
                 </a>
+                <a class="nav-item" data-nav="results-review">
+                    <i class="fas fa-check-to-slot"></i>
+                    Review Results
+                    <span id="results-review-count-badge" class="badge-count hidden">0</span>
+                </a>
 
             </nav>
 
@@ -701,7 +706,35 @@
                     </div>
                 </div>
 
-                <!-- Appeals Panel -->
+                <!-- Results Review Panel -->
+                <div id="panel-results-review" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Pending Result Submissions</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Review and accept results from Stage Managers to update the leaderboard.</p>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Student / Program</th>
+                                        <th>Department</th>
+                                        <th>Proposed Result</th>
+                                        <th>Submitted By</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="results-review-body"></tbody>
+                            </table>
+                            <div id="no-results-review-msg" class="hidden"
+                                style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                                <i class="fas fa-thumbs-up"
+                                    style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--success);"></i>
+                                All results have been reviewed
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="panel-appeals" class="hidden">
                     <div class="card">
                         <div class="card-header">

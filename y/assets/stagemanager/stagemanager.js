@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, onSnapshot, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, onSnapshot, updateDoc, deleteField, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { firebaseConfig } from "../core/firebase-config.js";
 
@@ -368,6 +368,9 @@ function renderParticipantsList() {
                     <button onclick="window.openRecordingModal('${p.id}', '${p.studentName.replace(/'/g, "\\'")}')" class="status-btn" title="Record Performance">
                         <i class="fas fa-video"></i>
                     </button>
+                    <button onclick="window.openResultsModal('${p.id}', '${p.studentName.replace(/'/g, "\\'")}')" class="status-btn" title="Award Rank/Position" style="background: rgba(251, 191, 36, 0.1); color: var(--gold);">
+                        <i class="fas fa-trophy"></i>
+                    </button>
                     ${p.chanceNumber ?
                 `<button onclick="window.initiateSwap('${p.id}')" class="swap-btn" title="Swap Position">
                             <i class="fas fa-exchange-alt"></i>
@@ -552,6 +555,62 @@ window.clearAllLots = async () => {
 
 window.closeLotteryModal = () => {
     document.getElementById('lottery-modal').classList.add('hidden');
+};
+
+// --- Results Management ---
+
+window.openResultsModal = (participantId, studentName) => {
+    currentParticipantId = participantId;
+    currentStudentName = studentName;
+    const modal = document.getElementById('results-modal');
+    document.getElementById('results-modal-title').textContent = `Award: ${studentName}`;
+    document.getElementById('results-modal-subtitle').textContent = `Program: ${currentProgramName}`;
+    document.getElementById('result-position').value = "";
+    document.getElementById('result-marks').value = "";
+    modal.classList.remove('hidden');
+};
+
+window.closeResultsModal = () => {
+    document.getElementById('results-modal').classList.add('hidden');
+};
+
+window.submitResult = async () => {
+    const position = document.getElementById('result-position').value;
+    const marks = document.getElementById('result-marks').value;
+
+    if (!position) {
+        alert("Please select a position or grade.");
+        return;
+    }
+
+    try {
+        toggleLoading(true);
+        const participant = currentParticipants.find(p => p.id === currentParticipantId);
+
+        await addDoc(collection(db, "pending_results"), {
+            participantId: currentParticipantId,
+            studentName: currentStudentName,
+            rollNumber: participant.rollNumber || "",
+            chestNumber: participant.chestNumber || participant.chessNumber || "",
+            department: participant.department || "",
+            programId: currentProgramId,
+            programName: currentProgramName,
+            position: position,
+            marks: marks,
+            submittedBy: currentUser.email,
+            submittedAt: new Date().toISOString(),
+            academicYear: systemYear,
+            status: 'pending'
+        });
+
+        alert("Result submitted for admin review!");
+        closeResultsModal();
+    } catch (error) {
+        console.error("Error submitting result:", error);
+        alert("Failed to submit result: " + error.message);
+    } finally {
+        toggleLoading(false);
+    }
 };
 
 // --- Video Recording Logic ---

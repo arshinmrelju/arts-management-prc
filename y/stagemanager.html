@@ -179,6 +179,47 @@
         </div>
     </div>
 
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal hidden" style="z-index: 5000;">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="results-modal-title" style="margin: 0;">Upload Result</h3>
+                    <div id="results-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                    </div>
+                </div>
+                <button onclick="closeResultsModal()" class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1.5rem;">
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Position
+                        / Grade</label>
+                    <select id="result-position"
+                        style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 0.8rem; border-radius: 0.5rem; outline: none;">
+                        <option value="">Select Position</option>
+                        <option value="1">First Place (5 Points)</option>
+                        <option value="2">Second Place (3 Points)</option>
+                        <option value="3">Third Place (1 Point)</option>
+                        <option value="A">A Grade (0 Points)</option>
+                        <option value="B">B Grade (0 Points)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Additional
+                        Marks / Comments (Optional)</label>
+                    <input type="text" id="result-marks" placeholder="Enter comments or marks..."
+                        style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 0.8rem; border-radius: 0.5rem; outline: none;">
+                </div>
+                <button id="submit-result-btn" onclick="submitResult()"
+                    style="width: 100%; background: var(--accent-primary); color: white; border: none; padding: 1rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+                    Submit for Admin Review
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Global Upload Status -->
     <div id="global-upload-container"
         style="position: fixed; bottom: 20px; right: 20px; z-index: 5000; display: flex; flex-direction: column; gap: 10px;">
