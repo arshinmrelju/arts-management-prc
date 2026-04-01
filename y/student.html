@@ -659,7 +659,16 @@
 
         <div class="form-group" style="flex: 1;">
           <label class="form-label" for="reg-roll">Roll No</label>
-          <input type="text" id="reg-roll" required class="form-input" placeholder="Roll No">
+          <div class="custom-dropdown-container">
+            <input type="hidden" id="reg-roll" required>
+            <div class="custom-dropdown-trigger" id="roll-trigger">
+              <span id="roll-selected-text">Roll No</span>
+              <span class="custom-dropdown-arrow"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="custom-dropdown-menu" id="roll-menu" style="max-height: 200px; overflow-y: auto;">
+              <!-- Generated via JS -->
+            </div>
+          </div>
         </div>
         <div class="form-group" style="flex: 1;">
           <label class="form-label">Year</label>
@@ -864,6 +873,7 @@
         // Setup Dropdowns
         setupCourseDropdown(linkData.allowedCourses || [], linkData.department);
         setupGenderDropdown();
+        setupRollDropdown();
         setupRegTypeToggle();
 
 
@@ -883,6 +893,16 @@
       document.getElementById('loading-screen').classList.add('hidden');
       document.getElementById('error-screen').classList.remove('hidden');
       document.getElementById('error-msg').textContent = msg;
+    }
+
+    function setupRollDropdown() {
+      const menu = document.getElementById('roll-menu');
+      let html = '';
+      for (let i = 1; i <= 100; i++) {
+        html += `<div class="custom-dropdown-item" data-value="${i}">${i}</div>`;
+      }
+      menu.innerHTML = html;
+      setupDropdown('roll-trigger', 'roll-menu', 'reg-roll', 'roll-selected-text');
     }
 
     function setupCourseDropdown(allowedCourses, department) {
@@ -912,7 +932,6 @@
         trigger.classList.add('has-value');
       }
     }
-
 
     function setupGenderDropdown() {
       setupDropdown('gender-trigger', 'gender-menu', 'reg-gender', 'gender-selected-text');
@@ -1175,19 +1194,45 @@
         }
 
         // 2. Individual Student Limits (Max 3 Off-Stage, Max 3 On-Stage Individual)
-        if (regType === "individual") {
+        if (regType.toLowerCase() === "individual") {
           let studentOffStageCount = 0;
           let studentOnStageIndCount = 0;
-          const sRoll = roll.toLowerCase();
-          const sYear = year.toLowerCase();
+          
+          // Robust student identity matching: Stripping leading zeros from Roll Numbers
+          // and ensuring department matches (to prevent collision between students in different courses with same roll no)
+          const sRoll = String(roll || "").trim().replace(/^0+/, "");
+          const sYear = String(year || "").trim().toLowerCase();
+          const sDept = String(dept || "").trim().toLowerCase();
+
+          // Resolve student's own parent department
+          let sMainDept = sDept;
+          const sNorm = sDept.replace(/\./g, "").trim();
+          for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
+            if (mDept.toLowerCase().replace(/\./g, "").trim() === sNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === sNorm)) {
+              sMainDept = mDept.toLowerCase().trim();
+              break;
+            }
+          }
 
           allDocsData.forEach(d => {
             if (d.isCanceled || d.isDeleted) return;
             
-            // Robust student matching
-            const dRoll = (d.rollNumber || "").trim().toLowerCase();
-            const dYear = (d.year || "").trim().toLowerCase();
-            if (dRoll !== sRoll || dYear !== sYear) return;
+            const dRoll = String(d.rollNumber || "").trim().replace(/^0+/, "");
+            const dYear = String(d.year || "").trim().toLowerCase();
+            const dDeptStr = String(d.department || "").trim().toLowerCase();
+
+            // Resolve doc's parent department
+            let dMainDept = dDeptStr;
+            const dNorm = dDeptStr.replace(/\./g, "").trim();
+            for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
+              if (mDept.toLowerCase().replace(/\./g, "").trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === dNorm)) {
+                dMainDept = mDept.toLowerCase().trim();
+                break;
+              }
+            }
+
+            // Match based on Consolidated Department + Year + Roll Number triple
+            if (dRoll !== sRoll || dYear !== sYear || dMainDept !== sMainDept) return;
 
             const dCat = (d.category || "").trim().toLowerCase();
             const dType = (d.regType || "Individual").trim().toLowerCase();
@@ -1196,10 +1241,10 @@
           });
 
           if (cat === "off stage" && studentOffStageCount >= 3) {
-            throw new Error(`You've been busy! You've already joined 3 Off-Stage events, which is our maximum per student.`);
+            throw new Error(`Limit Exceeded! You have already joined ${studentOffStageCount} Off-Stage events in your department (${sMainDept.toUpperCase()}).`);
           }
-          if (cat === "on stage" && regType === "individual" && studentOnStageIndCount >= 3) {
-            throw new Error(`That's a lot of talent! You've already registered for 3 On-Stage Individual events, which is the limit.`);
+          if (cat === "on stage" && regType.toLowerCase() === "individual" && studentOnStageIndCount >= 3) {
+            throw new Error(`Limit Exceeded! You have already registered for ${studentOnStageIndCount} On-Stage Individual events.`);
           }
         }
 
