@@ -65,6 +65,7 @@ onAuthStateChanged(auth, async (user) => {
         fetchArtsIdentity();
         fetchCertificateSettings();
         fetchPayments();
+        calculateProjectUsage(); // Added this call
         return;
     }
 
@@ -857,5 +858,56 @@ window.deletePayment = async function (id, amount) {
     } catch (error) {
         console.error("Delete error:", error);
         alert("Failed to delete: " + error.message);
+    }
+};
+
+// Project Usage Calculation Logic
+window.calculateProjectUsage = async function () {
+    const firestoreText = id('firestore-usage-text');
+    const firestoreBar = id('firestore-usage-bar');
+    const totalDocCountElem = id('total-doc-count');
+    const usagePercentageElem = id('usage-percentage');
+    const remainingSpaceElem = id('remaining-space-text');
+
+    if (!firestoreText) return;
+
+    firestoreText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+
+    try {
+        const collectionsToScan = ['registrations', 'score_logs', 'leaderboard', 'program_dates', 'whitelisted_emails', 'admin_users', 'project_payments'];
+        let totalDocs = 0;
+
+        for (const collName of collectionsToScan) {
+            const q = query(collection(db, collName));
+            const snapshot = await getDocs(q);
+            totalDocs += snapshot.size;
+        }
+
+        // Estimate weight: standard document overhead is ~0.5KB
+        const estimatedSizeKB = totalDocs * 0.5;
+        const estimatedSizeMB = (estimatedSizeKB / 1024).toFixed(2);
+        
+        // Firebase Free Tier Limit: 1GB = 1,048,576 KB
+        const totalLimitKB = 1024 * 1024; 
+        const usagePercent = ((estimatedSizeKB / totalLimitKB) * 100).toFixed(4);
+        const displayPercent = usagePercent < 0.01 ? "< 0.01%" : usagePercent + "%";
+
+        // Update UI
+        totalDocCountElem.textContent = totalDocs.toLocaleString();
+        firestoreText.textContent = `${estimatedSizeMB} MB of 1 GB`;
+        firestoreBar.style.width = `${Math.min(Math.max(usagePercent * 10, 0.5), 100)}%`; // Scale slightly for visibility if very small
+        
+        // Update color based on usage
+        if (usagePercent > 80) firestoreBar.className = 'usage-bar critical';
+        else if (usagePercent > 50) firestoreBar.className = 'usage-bar warning';
+        else firestoreBar.className = 'usage-bar';
+
+        usagePercentageElem.textContent = displayPercent;
+        remainingSpaceElem.textContent = (100 - usagePercent).toFixed(2) + "%";
+
+    } catch (error) {
+        console.error("Usage calculation error:", error);
+        firestoreText.textContent = "Error calculating usage";
+        firestoreText.style.color = "#ef4444";
     }
 };

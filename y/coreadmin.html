@@ -111,6 +111,15 @@
                             <span class="label">System Status</span>
                         </div>
                     </div>
+                    <div class="stat-card" id="resource-usage-stat">
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="value" id="usage-percentage">0%</span>
+                            <span class="label">Storage Used</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Admin Management Section -->
@@ -207,6 +216,56 @@
                             <button class="btn-primary" onclick="saveCertificateSettings()" style="padding: 0.8rem 2rem;">
                                 <i class="fas fa-save"></i> Save Certificate Settings
                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Capacity & Quotas Section -->
+                <div class="admin-management-card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-server"></i>
+                            Project Capacity & Quotas
+                        </h2>
+                        <button class="btn-icon" onclick="calculateProjectUsage()" title="Refresh Usage Data">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+
+                    <div style="padding: 1.5rem; display: grid; gap: 1.5rem;">
+                        <!-- Firestore Usage -->
+                        <div class="usage-item">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem;">
+                                <span style="font-weight: 600; color: var(--text-primary);">Firestore Database (Free Tier)</span>
+                                <span id="firestore-usage-text" style="color: var(--text-secondary);">Calculating...</span>
+                            </div>
+                            <div class="usage-bar-container">
+                                <div id="firestore-usage-bar" class="usage-bar" style="width: 0%; background: var(--accent);"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.7rem; color: var(--text-secondary);">
+                                <span>0 KB Used</span>
+                                <span>1 GB Limit</span>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <!-- Doc Count -->
+                            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Total Documents</div>
+                                <div id="total-doc-count" style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">0</div>
+                            </div>
+                            
+                            <!-- Remaining Capacity -->
+                            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Remaining Space</div>
+                                <div id="remaining-space-text" style="font-size: 1.25rem; font-weight: 700; color: var(--accent);">~99.9%</div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(59, 130, 246, 0.05); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.1);">
+                            <i class="fas fa-info-circle"></i> 
+                            Estimates are based on standard Firestore document overhead (~0.5KB per record). 
+                            Firebase Free Tier includes 1GB of total stored data across all services.
                         </div>
                     </div>
                 </div>

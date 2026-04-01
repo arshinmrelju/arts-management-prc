@@ -1177,3 +1177,36 @@ select option {
     font-weight: 600;
     min-height: 1.25rem;
 }
+
+/* Usage Bar Styles */
+.usage-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.usage-bar-container {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.usage-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(90deg, var(--accent), #34d399);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.usage-bar.warning {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.usage-bar.critical {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
