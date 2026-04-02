@@ -79,42 +79,7 @@ setTimeout(() => {
     });
 }, 1000);
 
-// Global system year variable (must be declared before try block)
-let systemYear = "2025-26"; // Default fallback
 
-// Listen to system year in real-time
-let systemYearListener = null;
-function startSystemYearListener() {
-    if (systemYearListener) return;
-    const yearRef = doc(db, "system_config", "current_year");
-    systemYearListener = onSnapshot(yearRef, (docSnap) => {
-        let oldYear = systemYear;
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            systemYear = data.year || "2025-26";
-            log(`System year updated in real-time: ${systemYear}`);
-        } else {
-            log("No system year configured, using default: 2025-26");
-            systemYear = "2025-26";
-        }
-
-        // Update UI elements
-        const sidebarYearText = document.getElementById('sidebar-year-text');
-        sidebarYearText.textContent = systemYear;
-
-
-        // If the year changed after initial load, refresh data automatically
-        if (isAppInitialized && oldYear !== systemYear) {
-            log("Year changed! Refreshing all data...");
-            refreshAll();
-            if (currentView === 'whitelist') fetchWhitelist();
-        }
-    }, (error) => {
-        console.error("Year listener Encountered an error:", error);
-        log("Year listener encounterd an error, attempting to restart...");
-        systemYearListener = null;
-    });
-}
 
 // Deprecated helper but kept for compatibility with any remaining calls
 window.fetchSystemYear = async function () {
@@ -130,146 +95,94 @@ window.fetchSystemYear = async function () {
     }
 };
 
-try {
-    const app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
-    rtdb = getDatabase(app);
-    log("Firebase initialized successfully.");
+    // UI Elements Definitions
+    const loginView = document.getElementById('login-view');
+    const adminDashboard = document.getElementById('admin-dashboard');
+    const userEmailSpan = document.getElementById('user-email');
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const statusMsg = document.getElementById('status-message');
+    const regBody = document.getElementById('registrations-body');
+    const whitelistBody = document.getElementById('whitelist-body');
+    const loadingInd = document.getElementById('loading-indicator');
+    const noDataMsg = document.getElementById('no-data-msg');
 
-    // Initialize system year listener
-    startSystemYearListener();
+    let allRegistrations = [];
+    let leaderboardScores = {};
+    let programDates = {};
+    let pendingResults = [];
+    let isAppInitialized = false;
 
-    log("Firebase initialized.");
-} catch (e) {
-    log("Initialization error:", e.message);
-}
+    let currentView = 'registrations';
+    let currentRegTab = 'On Stage';
+    let currentUserRole = '';
+    let currentUserDept = '';
+    let currentUserAllowedCourses = [];
+    let currentPDFFilename = '';
+    let currentFilters = {
+        search: '',
+        dept: '',
+        year: '',
+        item: '',
+        regType: ''
+    };
 
-const regBody = document.getElementById('registrations-body');
-const whitelistBody = document.getElementById('whitelist-body');
-const loadingInd = document.getElementById('loading-indicator');
-const noDataMsg = document.getElementById('no-data-msg');
-
-
-
-let allRegistrations = [];
-let leaderboardScores = {};
-let programDates = {};
-let pendingResults = [];
-
-let currentView = 'registrations';
-let currentRegTab = 'On Stage';
-let currentUserRole = '';
-let currentUserDept = '';
-let currentUserAllowedCourses = [];
-let currentFilters = {
-    search: '',
-    dept: '',
-    year: '',
-    item: '',
-    regType: ''
-};
-
-const OFF_STAGE_EVENTS = [
-    "Essay Writing (English)", "Essay Writing (Arabic)", "Essay Writing (Hindi)", "Essay Writing (Malayalam)", "Essay Writing (Tamil)", "Essay Writing (Urdu)",
-    "Story Writing (English)", "Story Writing (Arabic)", "Story Writing (Hindi)", "Story Writing (Malayalam)", "Story Writing (Tamil)", "Story Writing (Urdu)",
-    "Versification (English)", "Versification (Arabic)", "Versification (Hindi)", "Versification (Malayalam)", "Versification (Tamil)", "Versification (Urdu)",
-    "Extempore (English)", "Extempore (Hindi)", "Extempore (Malayalam)", "Extempore (Tamil)",
-    "Aksharashlokam",
-    "Kavyakeli",
-    "Water Colour",
-    "Oil Colour",
-    "Cartoon Drawing",
-    "Pencil Drawing",
-    "Clay Modeling",
-    "Collage",
-    "Embroidery",
-    "Poster Making",
-    "Rangoli",
-    "Spot Photography"
-];
-
-const ON_STAGE_INDIVIDUAL_EVENTS = [
-    "Light Music Boys", "Light Music Girls",
-    "Classical Music Boys", "Classical Music Girls",
-    "Mappila Pattu Boys", "Mappila Pattu Girls",
-    "Western Song",
-    "Poem Recitation (Malayalam)", "Poem Recitation (English)", "Poem Recitation (Hindi)", "Poem Recitation (Arabic)", "Poem Recitation (Tamil)", "Poem Recitation (Urdu)",
-    "Percussion Instruments Eastern",
-    "String Instruments Eastern",
-    "String Instruments Western",
-    "Bharatanatyam",
-    "Mohiniyattam",
-    "Classical Dance (Odissi)", "Classical Dance (Kathak)", "Classical Dance (Manipuri)", "Classical Dance (Kuchipudi)",
-    "Folk Dance Boys", "Folk Dance Girls",
-    "Kerala Natanam",
-    "Monoact",
-    "Mimicry",
-    "Kadha Presangam"
-];
-
-const ON_STAGE_GROUP_EVENTS = [
-    "Group Song (Indian)",
-    "Group Song (Western)",
-    "Mappila Paattu Group",
-    "Folk Music Group",
-    "Patriotic Song Group",
-    "Ganamela",
-    "Folk Dance Group",
-    "Thiruvathira",
-    "Kolkali",
-    "Daf Mutt",
-    "Oppana",
-    "Vattapatt",
-    "Margamkali",
-    "Drama",
-    "Mime",
-    "Skit"
-];
-
-const ON_STAGE_EVENTS = [...ON_STAGE_INDIVIDUAL_EVENTS, ...ON_STAGE_GROUP_EVENTS];
-const ALL_PROGRAMS = [...ON_STAGE_EVENTS, ...OFF_STAGE_EVENTS].sort();
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        rtdb = getDatabase(app);
+        log("Firebase initialized successfully.");
+    } catch (e) {
+        log("Initialization error:", e.message);
+    }
 
 
-const DEPARTMENTS = [
-    "Department of Economics",
-    "Department of English",
-    "Department of History",
-    "Department of Microbiology",
-    "Department of Travel and Tourism",
-    "Department of Journalism and Mass Communication",
-    "Department of Biochemistry",
-    "Department of Commerce"
-];
+    // Global system year variable
+    let systemYear = "2025-26"; // Default fallback
+    let systemYearListener = null;
 
-const DEPT_COURSES = {
-    "Department of Economics": ["B.A Economics", "B.A Econometrics and Data Management", "M.A Economics"],
-    "Department of English": ["B.A English Language and Literature"],
-    "Department of History": ["B.A History"],
-    "Department of Microbiology": ["B.Sc Microbiology", "M.Sc Microbiology"],
-    "Department of Travel and Tourism": ["Bachelor of Travel and Tourism Management (BTTM)", "Master of Travel and Tourism Management (MTTM)"],
-    "Tourism": ["Bachelor of Travel and Tourism Management (BTTM)", "Master of Travel and Tourism Management (MTTM)"],
-    "Department of Journalism and Mass Communication": ["B.A Journalism and Mass Communication", "M.A Journalism & Mass Communication"],
-    "Department of Biochemistry": ["B.Sc Biochemistry", "M.Sc Biochemistry"],
-    "Department of Commerce": ["BBA", "M.COM"]
-};
+    function startSystemYearListener() {
+        if (systemYearListener) return;
+        const yearRef = doc(db, "system_config", "current_year");
+        systemYearListener = onSnapshot(yearRef, (docSnap) => {
+            let oldYear = systemYear;
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                systemYear = data.year || "2025-26";
+                log(`System year updated in real-time: ${systemYear}`);
+            } else {
+                log("No system year configured, using default: 2025-26");
+                systemYear = "2025-26";
+            }
 
-const COURSE_TO_DEPT = {
-    "B.A Economics": "Department of Economics",
-    "B.A Econometrics and Data Management": "Department of Economics",
-    "M.A Economics": "Department of Economics",
-    "B.A English Language and Literature": "Department of English",
-    "B.A History": "Department of History",
-    "B.Sc Microbiology": "Department of Microbiology",
-    "M.Sc Microbiology": "Department of Microbiology",
-    "Bachelor of Travel and Tourism Management (BTTM)": "Department of Travel and Tourism",
-    "Master of Travel and Tourism Management (MTTM)": "Department of Travel and Tourism",
-    "B.A Journalism and Mass Communication": "Department of Journalism and Mass Communication",
-    "M.A Journalism & Mass Communication": "Department of Journalism and Mass Communication",
-    "B.Sc Biochemistry": "Department of Biochemistry",
-    "M.Sc Biochemistry": "Department of Biochemistry",
-    "BBA": "Department of Commerce",
-    "M.COM": "Department of Commerce"
+            const sidebarYearText = document.getElementById('sidebar-year-text');
+            if (sidebarYearText) sidebarYearText.textContent = systemYear;
+
+            if (isAppInitialized && oldYear !== systemYear) {
+                log("Year changed! Refreshing all data...");
+                refreshAll();
+                if (currentView === 'whitelist') fetchWhitelist();
+            }
+        }, (error) => {
+            console.error("Year listener Encountered an error:", error);
+            log("Year listener encounterd an error, attempting to restart...");
+            systemYearListener = null;
+        });
+    }
+
+    // Initialize system year listener after auth or immediately if needed
+    // startSystemYearListener(); // Moved to fetchSystemYear or similar
+    const COURSE_TO_DEPT = {
+        "B.A Econometrics and Data Management": "Department of Economics",
+        "M.A Economics": "Department of Economics",
+                                "Master of Travel and Tourism Management (MTTM)": "Department of Travel and Tourism",
+                                    "B.A Journalism and Mass Communication": "Department of Journalism and Mass Communication",
+                                        "M.A Journalism & Mass Communication": "Department of Journalism and Mass Communication",
+                                            "B.Sc Biochemistry": "Department of Biochemistry",
+                                                "M.Sc Biochemistry": "Department of Biochemistry",
+                                                    "BBA": "Department of Commerce",
+                                                        "M.COM": "Department of Commerce"
 };
 
 const getDisplayDept = (student) => {
@@ -285,7 +198,7 @@ const getDisplayDept = (student) => {
 
 
 // Set Default User
-if (userEmailSpan) userEmailSpan.textContent = "Admin User";
+// Removed failing line that ran before definition: if (userEmailSpan) userEmailSpan.textContent = "Admin User";
 
 // --- Functions first ---
 
@@ -1850,17 +1763,17 @@ window.fetchRegistrations = fetchRegistrations;
 const refreshAll = async () => {
     const tasks = [fetchLeaderboard(), fetchRegistrations()];
     if (currentUserRole !== 'Leaderboard') {
-        tasks.push(fetchWhitelist(), fetchSettings(), fetchNews());
+        tasks.push(fetchWhitelist(), fetchSettings());
     }
     await Promise.all(tasks);
+    isAppInitialized = true;
 };
 window.refreshAll = refreshAll;
 
 
 
+
 // --- Listeners and Init ---
-
-
 
 const refreshBtn = document.getElementById('refresh-btn');
 if (refreshBtn) {
@@ -2974,8 +2887,6 @@ window.closePDFPreview = () => {
     document.getElementById('pdf-preview-container').innerHTML = '';
 };
 
-let currentPDFFilename = "";
-
 window.openJudgeSheetPreview = () => {
     const btn = document.querySelector('button[title="Print Judge Sheets"]');
     const originalContent = '<i class="fas fa-gavel"></i> Judge Sheets';
@@ -4028,7 +3939,7 @@ window.fetchCertificates = async () => {
     log("Fetching awarded prizes for certificates...");
     const tbody = document.getElementById('certificates-body');
     if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading winners...</td></tr>';
-    
+
     try {
         const q = query(
             collection(db, "score_logs"),
@@ -4042,7 +3953,7 @@ window.fetchCertificates = async () => {
                 allCertificates.push({ id: doc.id, ...data });
             }
         });
-        
+
         // Sort in memory to avoid needing a composite index
         allCertificates.sort((a, b) => {
             const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
@@ -4063,13 +3974,13 @@ window.renderCertificatesTable = () => {
     const search = document.getElementById('cert-search') ? document.getElementById('cert-search').value.toLowerCase() : "";
     const posFilter = document.getElementById('cert-filter-pos') ? document.getElementById('cert-filter-pos').value : "";
     const noMsg = document.getElementById('no-cert-msg');
-    
+
     if (!tbody) return;
     tbody.innerHTML = '';
-    
+
     const filtered = allCertificates.filter(c => {
-        const matchesSearch = (c.participantName || "").toLowerCase().includes(search) || 
-                            (c.itemName || "").toLowerCase().includes(search);
+        const matchesSearch = (c.participantName || "").toLowerCase().includes(search) ||
+            (c.itemName || "").toLowerCase().includes(search);
         const matchesPos = !posFilter || c.position === posFilter;
         return matchesSearch && matchesPos;
     });
@@ -4177,14 +4088,14 @@ window.openCertificatePreview = async (logId) => {
         const normRegName = normalizeString(r.studentName);
         const normRegGroup = normalizeString(r.groupName);
 
-        const deptsMatch = (normRegDept === normLogDept) || 
-                          (normRegDept && normLogDept && (normRegDept.startsWith(normLogDept) || normLogDept.startsWith(normRegDept)));
+        const deptsMatch = (normRegDept === normLogDept) ||
+            (normRegDept && normLogDept && (normRegDept.startsWith(normLogDept) || normLogDept.startsWith(normRegDept)));
         const itemsMatch = normRegItem === normLogItem;
-        
+
         if (!itemsMatch || !deptsMatch) return false;
 
         if (r.regType === 'Group') return true; // Department + Program is unique for groups
-        
+
         const namesMatch = normRegName === normLogPart || normRegGroup === normLogPart;
         return namesMatch;
     });
@@ -4231,14 +4142,14 @@ window.openCertificatePreview = async (logId) => {
 window.processPDFDownload = () => {
     const element = document.getElementById('certificate-template');
     if (!element) return;
-    
+
     const parentContainer = element.parentElement;
     parentContainer.style.display = 'block';
     element.style.display = 'block';
 
     const name = document.getElementById('cert-display-name').textContent.replace(/\s+/g, '_');
     const program = document.getElementById('cert-display-program').textContent.replace(/\s+/g, '_');
-    
+
     const opt = {
         margin: 0,
         filename: `Certificate_${name}_${program}.pdf`,
@@ -4303,11 +4214,11 @@ window.downloadAllGroupCerts = async () => {
     try {
         for (let i = 0; i < options.length; i++) {
             const name = options[i].value;
-            log(`Batch Generating ${i+1}/${options.length}: ${name}`);
-            
+            log(`Batch Generating ${i + 1}/${options.length}: ${name}`);
+
             if (nameEl) nameEl.textContent = name;
             await new Promise(r => setTimeout(r, 800));
-            
+
             const element = document.getElementById('certificate-template');
             const parentContainer = element.parentElement;
             parentContainer.style.display = 'block';
@@ -4315,7 +4226,7 @@ window.downloadAllGroupCerts = async () => {
 
             const fileName = name.replace(/\s+/g, '_');
             const program = document.getElementById('cert-display-program').textContent.replace(/\s+/g, '_');
-            
+
             const opt = {
                 margin: 0,
                 filename: `Certificate_${fileName}_${program}.pdf`,
@@ -4326,7 +4237,7 @@ window.downloadAllGroupCerts = async () => {
 
             await html2pdf().set(opt).from(element).save();
             await new Promise(r => setTimeout(r, 500));
-            
+
             element.style.display = 'none';
             parentContainer.style.display = 'none';
         }
@@ -4359,7 +4270,7 @@ const initResultsListener = () => {
         snapshot.forEach(doc => {
             pendingResults.push({ id: doc.id, ...doc.data() });
         });
-        
+
         // Update Badge
         const badge = document.getElementById('results-review-count-badge');
         if (badge) {
@@ -4379,7 +4290,7 @@ window.renderResultsReview = () => {
     if (!tbody) return;
 
     tbody.innerHTML = '';
-    
+
     if (pendingResults.length === 0) {
         if (noMsg) noMsg.classList.remove('hidden');
         return;
@@ -4403,7 +4314,7 @@ window.renderResultsReview = () => {
             </td>
             <td>
                 <div style="font-size: 0.8rem;">${res.submittedBy.split('@')[0]}</div>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">${new Date(res.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">${new Date(res.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </td>
             <td>
                 <div style="display: flex; gap: 0.5rem;">
@@ -4424,7 +4335,7 @@ window.acceptResult = async (resultId) => {
 
     try {
         log(`Accepting result: ${res.studentName} - ${res.position}`);
-        
+
         // Calculate Points
         let points = 0;
         if (res.position === '1') points = 5;
@@ -4495,7 +4406,7 @@ window.rejectResult = async (resultId) => {
 
 // Start listener when system is ready
 const originalRefreshAll = window.refreshAll;
-window.refreshAll = function() {
+window.refreshAll = function () {
     if (typeof originalRefreshAll === 'function') originalRefreshAll();
     initResultsListener();
 };
