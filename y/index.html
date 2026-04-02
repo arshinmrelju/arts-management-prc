@@ -3611,7 +3611,9 @@
       .bottom-nav-item:active {
         transform: scale(0.9);
       }
-    } /* end @media (max-width: 768px) */
+    }
+
+    /* end @media (max-width: 768px) */
 
     @media (min-width: 769px) {
       .bottom-nav {
@@ -5260,6 +5262,18 @@
       "Department of Commerce": ["BBA", "M.COM"]
     };
 
+    const getDisplayDept = (student) => {
+      let dept = student.department || '-';
+      if (student.category === 'On Stage' && student.regType === 'Group') {
+        for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
+          if (mDept === dept || courses.includes(dept)) {
+            return mDept;
+          }
+        }
+      }
+      return dept;
+    };
+
     const checkWhitelistStatus = async (email) => {
       const emailLower = email.toLowerCase();
       if (ADMIN_EMAILS.includes(emailLower) || ADMIN_EMAILS.includes(email)) return { authorized: true, department: "Main Admin" };
@@ -6522,10 +6536,10 @@
               let sMainDept = sDept;
               const sNorm = sDept.replace(/\./g, '').trim();
               for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
-                  if (mDept.toLowerCase().replace(/\./g, "").trim() === sNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === sNorm)) {
-                      sMainDept = mDept.toLowerCase().trim();
-                      break;
-                  }
+                if (mDept.toLowerCase().replace(/\./g, "").trim() === sNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === sNorm)) {
+                  sMainDept = mDept.toLowerCase().trim();
+                  break;
+                }
               }
 
               // Fetch Pending registrations as well for a complete check, but exclude the current document being approved
@@ -6546,10 +6560,10 @@
                 let dMainDept = dDeptStr;
                 const dNorm = dDeptStr.replace(/\./g, '').trim();
                 for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
-                    if (mDept.toLowerCase().replace(/\./g, "").trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === dNorm)) {
-                        dMainDept = mDept.toLowerCase().trim();
-                        break;
-                    }
+                  if (mDept.toLowerCase().replace(/\./g, "").trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === dNorm)) {
+                    dMainDept = mDept.toLowerCase().trim();
+                    break;
+                  }
                 }
 
                 // Match based on Consolidated Department + Year + Roll Number triple
@@ -7135,7 +7149,7 @@
             // Fetch ALL registrations/pending for this academic year to prevent bypass via naming variations
             const qAllReg = query(collection(db, "registrations"), where("academicYear", "==", regYear));
             const qAllPend = query(collection(db, "pending_registrations"), where("academicYear", "==", regYear), where("status", "==", "pending"));
-            
+
             let snapAllReg, snapAllPend;
             try {
               const [regSnap, pendSnap] = await Promise.all([
@@ -7188,15 +7202,15 @@
               let sMainDept = sDept;
               const sNorm = sDept.replace(/\./g, '').trim();
               for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
-                  if (mDept.toLowerCase().replace(/\./g, "").trim() === sNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === sNorm)) {
-                      sMainDept = mDept.toLowerCase().trim();
-                      break;
-                  }
+                if (mDept.toLowerCase().replace(/\./g, "").trim() === sNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === sNorm)) {
+                  sMainDept = mDept.toLowerCase().trim();
+                  break;
+                }
               }
 
               allRegDocs.forEach(d => {
                 if (d.isCanceled || d.isDeleted) return;
-                
+
                 const dRoll = String(d.rollNumber || "").trim().replace(/^0+/, "");
                 const dYear = String(d.year || "").trim().toLowerCase();
                 const dDeptStr = String(d.department || "").trim().toLowerCase();
@@ -7205,10 +7219,10 @@
                 let dMainDept = dDeptStr;
                 const dNorm = dDeptStr.replace(/\./g, '').trim();
                 for (const [mDept, courses] of Object.entries(departmentCourseMap)) {
-                    if (mDept.toLowerCase().replace(/\./g, "").trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === dNorm)) {
-                        dMainDept = mDept.toLowerCase().trim();
-                        break;
-                    }
+                  if (mDept.toLowerCase().replace(/\./g, "").trim() === dNorm || courses.some(c => c.toLowerCase().replace(/\./g, "").trim() === dNorm)) {
+                    dMainDept = mDept.toLowerCase().trim();
+                    break;
+                  }
                 }
 
                 // Match based on Consolidated Department + Year + Roll Number triple
@@ -7853,7 +7867,7 @@
                               <i class="fas fa-trophy" style="margin-right: 0.5rem; color: ${posColor};"></i>${escapeHtml(winner.program)}
                             </div>
                             <div style="font-size: 0.8rem; color: var(--text-secondary);">
-                              <i class="fas fa-graduation-cap" style="margin-right: 0.5rem;"></i>${(escapeHtml(winner.department) || 'N/A').replace(/Dep\.\s+of\s+|Department\s+of\s+/i, '')}
+                              <i class="fas fa-graduation-cap" style="margin-right: 0.5rem;"></i>${(escapeHtml(getDisplayDept(winner)) || 'N/A').replace(/Dep\.\s+of\s+|Department\s+of\s+/i, '')}
                             </div>
                           </div>
                           <div style="text-align: right;">
@@ -8227,7 +8241,7 @@
                       </div>
                       ${d.regType === 'Group' && d.studentName && d.groupName ? `<div style="font-size: 0.7rem; color: #6366f1;">Leader: ${d.studentName}</div>` : ''}
                     </td>
-                    <td>${(d.department || '-').replace(/Dep\.\s+of\s+|Department\s+of\s+/i, '')}</td>
+                    <td>${(getDisplayDept(d) || '-').replace(/Dep\.\s+of\s+|Department\s+of\s+/i, '')}</td>
                     <td style="font-family: monospace;">${d.rollNumber || '-'}</td>
                     <td>${d.year || '-'}</td>
                     <td>${d.regType || 'Individual'}</td>
