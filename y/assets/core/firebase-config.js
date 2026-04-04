@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 // Shared Firebase Configuration
 export const firebaseConfig = {
@@ -25,55 +25,52 @@ try {
   if (appCheck) {
       const dbCheck = getFirestore(appCheck);
 
-      async function checkMaintenanceMode() {
+      function setupMaintenanceListener() {
           const path = window.location.pathname.toLowerCase();
-          if (path.includes('coreadmin') || path.includes('admin') || path.includes('stagemanager')) {
+          
+          // Allow coreadmin to bypass maintenance restrictions completely
+          if (path.includes('coreadmin.html') || path.includes('coreadmin')) {
               return;
           }
           
           try {
-              const docSnap = await getDoc(doc(dbCheck, "system_config", "maintenance"));
-              if (docSnap.exists() && docSnap.data().active === true) {
-                  const applyLock = () => {
-                      // Prevent multiple injections
-                      if (document.getElementById('maint-lock')) return;
-                      
-                      const overlay = document.createElement('div');
-                      overlay.id = 'maint-lock';
-                      overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030712; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2147483647; color: white; font-family: "Inter", sans-serif;';
-                      overlay.innerHTML = `
-                          <div style="text-align: center; max-width: 600px; padding: 2rem; background: rgba(255,255,255,0.03); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-                              <h1 style="font-size: 2.2rem; margin-bottom: 1rem; color: #f59e0b;">System Maintenance</h1>
-                              <p style="font-size: 1.1rem; color: #94a3b8; line-height: 1.6;">We are currently performing scheduled maintenance to improve your experience. Please check back shortly.</p>
-                          </div>
-                      `;
-                      
-                      document.body.appendChild(overlay);
-                      document.body.style.overflow = 'hidden';
-                      
-                      // Hide other body children
-                      Array.from(document.body.children).forEach(child => {
-                          if (child.id !== 'maint-lock' && child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE') {
-                              child.style.display = 'none';
-                          }
-                      });
-                  };
-
-                  if (document.body) {
-                      applyLock();
+              const maintDocRef = doc(dbCheck, "system_config", "maintenance");
+              onSnapshot(maintDocRef, (docSnap) => {
+                  const isMaintenanceActive = docSnap.exists() && docSnap.data().active === true;
+                  // Use 'maintenance' so it matches Firebase Hosting's clean URL '/maintenance'
+                  const isOnMaintenancePage = path.includes('maintenance');
+                  
+                  if (isMaintenanceActive) {
+                      // If active and NOT already on the maintenance page, redirect there
+                      if (!isOnMaintenancePage) {
+                          let basePath = window.location.href.split('?')[0];
+                          if (basePath.endsWith('/')) basePath += 'index.html';
+                          const urlParts = basePath.split('/');
+                          // Append .html which Firebase cleanly redirects if configured
+                          urlParts[urlParts.length - 1] = 'maintenance.html';
+                          window.location.replace(urlParts.join('/'));
+                      }
                   } else {
-                      document.addEventListener('DOMContentLoaded', applyLock);
+                      // If NOT active but user is ON the maintenance page, redirect to index
+                      if (isOnMaintenancePage) {
+                          let basePath = window.location.href.split('?')[0];
+                          const urlParts = basePath.split('/');
+                          urlParts[urlParts.length - 1] = ''; // points back to root/index
+                          window.location.replace(urlParts.join('/'));
+                      }
                   }
-              }
+              }, (error) => {
+                  console.error("Maintenance listener error:", error);
+              });
           } catch (e) {
-              console.error("Maintenance check failed:", e);
+              console.error("Maintenance configuration failed:", e);
           }
       }
 
       if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', checkMaintenanceMode);
+          document.addEventListener('DOMContentLoaded', setupMaintenanceListener);
       } else {
-          checkMaintenanceMode();
+          setupMaintenanceListener();
       }
   }
 } catch (globalErr) {
