@@ -62,6 +62,7 @@ onAuthStateChanged(auth, async (user) => {
         // Initialize App
         fetchAdmins();
         fetchSystemYear();
+        fetchMaintenanceState();
         fetchArtsIdentity();
         fetchCertificateSettings();
         fetchPayments();
@@ -149,6 +150,69 @@ window.updateSystemYear = async function () {
     } catch (error) {
         console.error("Error updating system year:", error);
         yearStatus.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Error: ${error.message}`;
+    }
+};
+
+// Maintenance Mode Management
+window.fetchMaintenanceState = async function () {
+    const btn = document.getElementById('maintenance-mode-btn');
+    if (!btn) return;
+    try {
+        const docSnap = await getDoc(doc(db, "system_config", "maintenance"));
+        if (docSnap.exists() && docSnap.data().active) {
+            btn.innerHTML = '<i class="fas fa-toggle-on"></i> Disable Maintenance';
+            btn.style.background = 'rgba(239, 68, 68, 0.2)';
+            btn.style.color = '#fca5a5';
+            btn.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            btn.dataset.state = 'active';
+        } else {
+            btn.innerHTML = '<i class="fas fa-toggle-off"></i> Enable Maintenance';
+            btn.style.background = 'rgba(255, 255, 255, 0.05)';
+            btn.style.color = 'white';
+            btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            btn.dataset.state = 'inactive';
+        }
+    } catch (err) {
+        console.error("Error fetching maintenance state:", err);
+        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+    }
+};
+
+window.toggleMaintenanceMode = async function () {
+    const btn = document.getElementById('maintenance-mode-btn');
+    const statusMsg = document.getElementById('maintenance-status-msg');
+    if (!btn) return;
+
+    const isCurrentlyActive = btn.dataset.state === 'active';
+    const newState = !isCurrentlyActive;
+    const actionText = newState ? 'enable' : 'disable';
+
+    if (!confirm(`Are you sure you want to ${actionText} maintenance mode?`)) return;
+
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+    try {
+        await setDoc(doc(db, "system_config", "maintenance"), {
+            active: newState,
+            updatedAt: serverTimestamp(),
+            updatedBy: auth.currentUser.email
+        });
+        
+        statusMsg.textContent = `Maintenance mode ${newState ? 'enabled' : 'disabled'}!`;
+        statusMsg.style.color = newState ? '#fca5a5' : 'var(--success)';
+        
+        setTimeout(() => { statusMsg.textContent = ''; }, 3000);
+        
+        await window.fetchMaintenanceState();
+    } catch (err) {
+        console.error("Error updating maintenance mode:", err);
+        statusMsg.textContent = `Error: ${err.message}`;
+        statusMsg.style.color = 'var(--error)';
+        btn.innerHTML = originalText;
+    } finally {
+        btn.disabled = false;
     }
 };
 
