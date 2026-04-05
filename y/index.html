@@ -5412,12 +5412,34 @@
           await fetchSystemYear();
           const authResult = await checkWhitelistStatus(user.email);
 
-          // Check for true Firestore admin status
+          // Check for true Firestore admin status and role authorization
           try {
             const adminDocRef = doc(db, "admin_users", user.uid);
             const adminDocByEmailRef = doc(db, "admin_users", user.email.toLowerCase());
             const [uidSnap, emailSnap] = await Promise.all([getDoc(adminDocRef), getDoc(adminDocByEmailRef)]);
-            isFirestoreAdmin = uidSnap.exists() || emailSnap.exists() || ADMIN_EMAILS.includes(user.email.toLowerCase());
+            
+            const adminData = uidSnap.exists() ? uidSnap.data() : (emailSnap.exists() ? emailSnap.data() : null);
+            isFirestoreAdmin = adminData !== null || ADMIN_EMAILS.includes(user.email.toLowerCase());
+
+            // Define allowed roles for index.html entry
+            const allowedRoles_portal = ['Admin', 'Main', 'Sub'];
+            let userRoleFromDb = adminData ? adminData.role : (ADMIN_EMAILS.includes(user.email.toLowerCase()) ? 'Admin' : null);
+
+            // Access Control: Only allow Main, Sub, and hardcoded Admins
+            if (!allowedRoles_portal.includes(userRoleFromDb)) {
+              console.warn("Restricted Access Denied for role/user:", userRoleFromDb || "Secretary/User");
+              if (authStatus) authStatus.textContent = `Access Denied: Only Main and Sub Access accounts are authorized for this portal.`;
+              setTimeout(() => {
+                push(ref(rtdb, 'status_history/' + user.uid), {
+                  state: 'offline',
+                  timestamp: serverTimestamp(),
+                  email: user.email,
+                  note: `Access Denied: Unauthorized entry attempt (Role: ${userRoleFromDb || 'Secretary/Other'})`
+                });
+                signOut(auth);
+              }, 3000);
+              return; // Terminate further initialization
+            }
           } catch (e) {
             console.warn("Could not verify Firestore admin status:", e);
           }
