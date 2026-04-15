@@ -5423,7 +5423,7 @@
 
             // Define allowed roles for index.html entry
             const allowedRoles_portal = ['Admin', 'Main', 'Sub'];
-            let userRoleFromDb = adminData ? adminData.role : (ADMIN_EMAILS.includes(user.email.toLowerCase()) ? 'Admin' : null);
+            let userRoleFromDb = adminData ? adminData.role : (ADMIN_EMAILS.includes(user.email.toLowerCase()) ? 'Admin' : (authResult.role || null));
 
             // Access Control: Only allow Main, Sub, and hardcoded Admins
             if (!allowedRoles_portal.includes(userRoleFromDb)) {
