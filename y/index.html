@@ -217,26 +217,36 @@
     }
 
     header {
-      padding: 1.5rem 2rem;
+      padding: 0.75rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 1200px;
       box-sizing: border-box;
       z-index: 1000;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    header:hover {
+      background: rgba(15, 23, 42, 0.75);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     .logo {
       font-family: var(--font-heading);
-      font-size: 1.8rem;
+      font-size: 1.3rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       background: linear-gradient(to right, #f472b6, #a78bfa, #db2777);
@@ -247,6 +257,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      text-decoration: none;
     }
 
     .live-indicator {
@@ -291,25 +302,74 @@
     }
 
     .logo img {
-      height: 45px;
+      height: 38px;
       width: auto;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     nav a {
       color: var(--text-secondary);
       text-decoration: none;
-      margin-left: 2rem;
       font-family: var(--font-heading);
       font-weight: 500;
-      font-size: 1rem;
-      transition: all 0.3s;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--accent-color);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(-50%);
+      border-radius: 2px;
     }
 
     nav a:hover {
       color: white;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    nav a:hover::after {
+      width: 40%;
+    }
+
+    nav #logout-btn {
+      color: #f87171 !important;
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      margin-left: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem !important;
+      opacity: 1 !important;
+    }
+
+    nav #logout-btn::after {
+      display: none;
+    }
+
+    nav #logout-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5 !important;
+      border-color: rgba(239, 68, 68, 0.3);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
     }
 
     .admin-btn {
@@ -599,15 +659,24 @@
       }
 
       .logo {
-        font-size: 1.1rem;
-        max-width: 200px;
-        line-height: 1.2;
+        font-size: 1.15rem;
+        max-width: 220px;
+        line-height: 1.1;
+        white-space: normal;
+        gap: 12px;
+      }
+      
+      .logo img {
+        height: 40px;
       }
 
       header {
-        padding: 1rem 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
+        padding: 0.75rem 1.25rem;
+        flex-wrap: nowrap;
+        width: 92%;
+        top: 1rem;
+        border-radius: 20px;
+        gap: 0;
       }
 
       nav a {
@@ -1968,7 +2037,7 @@
       gap: 6px;
       cursor: pointer;
       z-index: 1000;
-      padding: 10px;
+      padding: 8px 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -2013,12 +2082,13 @@
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
       z-index: 900;
-      padding: 8rem 2rem 2rem;
+      padding: 6rem 2rem 2rem;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem;
       transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       border-left: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
     }
 
     .mobile-nav.active {
@@ -2026,20 +2096,44 @@
     }
 
     .mobile-nav a {
-      color: white;
+      color: rgba(255, 255, 255, 0.85);
       text-decoration: none;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-family: var(--font-heading);
-      font-weight: 700;
+      font-weight: 600;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       gap: 1rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .mobile-nav a:hover {
-      color: var(--accent-color);
+      color: white;
       transform: translateX(10px);
+      border-bottom-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .mobile-nav #mobile-logout-btn {
+      margin-top: auto;
+      color: #f87171 !important;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-bottom: none;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .mobile-nav #mobile-logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
+      color: #fca5a5 !important;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
     }
 
     /* Overlay for Mobile Nav */
@@ -3757,8 +3851,7 @@
     <a href="/news/" class="mobile-link">News</a>
     <a href="#my-registrations" class="mobile-link">My Registrations</a>
     <a href="/appeal" class="mobile-link">Go for Appeal</a>
-    <a href="javascript:void(0)" id="mobile-logout-btn"
-      style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1rem; opacity: 0.7;">Logout</a>
+    <a href="javascript:void(0)" id="mobile-logout-btn">Logout</a>
   </div>
 
 
@@ -3921,7 +4014,7 @@
       <div class="logo">
         <img src="assets/Pazhassiraja_College_Pulpally_Logo.png" alt="College Logo">
         <div style="display: flex; flex-direction: column; line-height: 1.1;">
-          <span style="font-size: 1.2rem; font-weight: 800;">COLLEGE UNION PRC</span>
+          <span style="font-weight: 800;">COLLEGE UNION PRC</span>
         </div>
       </div>
       <nav>
@@ -3933,8 +4026,9 @@
         <a href="#my-registrations">My Registrations</a>
         <a href="/appeal">Go for Appeal</a>
 
-        <a href="javascript:void(0)" id="logout-btn"
-          style="color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; opacity: 0.7;">Logout</a>
+        <a href="javascript:void(0)" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
       </nav>
 
       <!-- Hamburger Menu (Mobile) -->
