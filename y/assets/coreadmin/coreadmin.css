@@ -76,20 +76,17 @@ body::before {
 }
 
 .main-content-column {
-    grid-column: span 9;
+    grid-column: span 12;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    animation: fadeInSlide 0.6s ease-out forwards;
 }
 
 .side-content-column {
-    grid-column: span 3;
-    display: flex;
-    flex-direction: column;
+    grid-column: span 12;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 1.5rem;
-    animation: fadeInSlide 0.6s ease-out 0.2s forwards;
-    opacity: 0;
 }
 
 @keyframes fadeInSlide {
@@ -547,7 +544,7 @@ select option {
     background: linear-gradient(135deg, var(--accent), #059669);
     color: white;
     padding: 0 1.75rem;
-    height: 52px;
+    height: 56px;
     border-radius: 1rem;
     border: none;
     font-size: 0.9rem;
@@ -960,25 +957,46 @@ select option {
 }
 
 .admin-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 2rem;
-    border-radius: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 2fr 1.2fr auto;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4));
+    padding: 2.5rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: flex-end;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
 }
 
 .admin-form .form-group {
-    flex: 1;
-    min-width: 260px;
+    width: 100%;
 }
 
 .admin-form .form-group:last-child {
-    flex: 0 0 auto;
-    min-width: 180px;
+    width: auto;
+}
+
+.system-year-select {
+    height: 52px !important;
+}
+
+.config-save-btn {
+    white-space: nowrap;
+    height: 52px !important;
+    padding: 0 2rem !important;
 }
 
 @media (max-width: 768px) {
@@ -989,8 +1007,19 @@ select option {
 
 .admin-form input,
 .admin-form select {
-    flex: 1;
-    min-width: 200px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    height: 56px;
+    font-size: 1rem;
+    padding: 0 1.5rem;
+}
+
+.admin-form input:focus,
+.admin-form select:focus {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
 }
 
 .admin-form .btn-primary {
@@ -1005,11 +1034,18 @@ select option {
 .admin-row {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: all 0.3s ease;
+}
+
+.admin-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(16, 185, 129, 0.2);
+    transform: translateX(4px);
 }
 
 .admin-email-badge {
@@ -1624,8 +1660,8 @@ select option {
         grid-template-columns: 1fr;
     }
 
-    .admin-form .form-group {
-        flex: 1 1 100%;
+    .admin-form {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1636,11 +1672,21 @@ select option {
 }
 
 .form-group label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Usage Container Premium */
