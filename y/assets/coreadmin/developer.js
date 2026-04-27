@@ -64,25 +64,46 @@ function startUptimeCounter() {
 function initTerminalLogs() {
     const logWindow = document.getElementById('log-window');
     const logs = [
-        "Memory leak check: PASS",
-        "Garbage collection executed",
-        "Firestore buffer synchronized",
-        "New admin session established",
-        "Security audit complete: 0 vulnerabilities",
-        "Cache invalidated for registrations",
-        "Background worker 'mail-service' active",
-        "Database shard A-1 responding",
-        "Optimization complete: Index rebuilt"
+        "♛ Sovereign session authenticated — throne secured",
+        "⚔ Security perimeter scan: 0 breaches detected",
+        "✦ Firestore vault synchronized — all records sealed",
+        "⚡ Background herald 'mail-service' standing by",
+        "♛ Cache purged — kingdom reindexed at full speed",
+        "✦ Database shard A-1 answering the royal call",
+        "⚔ Garbage sweep complete — all debris cleared",
+        "⚡ Network watchmen report: latency nominal",
+        "♛ Optimization decree enacted — index rebuilt",
+        "✦ Memory garrison: all walls holding strong",
+        "⚔ Auth tower confirmed: zero imposters detected",
+        "⚡ System heartbeat: steady as the crown endures"
     ];
 
     setInterval(() => {
         const line = document.createElement('div');
         line.className = 'log-line';
+        line.style.opacity = '0';
+        line.style.transform = 'translateY(10px)';
+        line.style.transition = 'all 0.3s ease';
+        
         const timestamp = new Date().toLocaleTimeString();
         line.textContent = `[${timestamp}] > ${logs[Math.floor(Math.random() * logs.length)]}`;
         logWindow.appendChild(line);
+        
+        // Trigger animation
+        setTimeout(() => {
+            line.style.opacity = '1';
+            line.style.transform = 'translateY(0)';
+        }, 10);
+
         logWindow.scrollTop = logWindow.scrollHeight;
         
+        // Random Glitch on title
+        if (Math.random() > 0.9) {
+            const title = document.querySelector('.glitch-title');
+            title.style.animation = 'none';
+            setTimeout(() => title.style.animation = '', 100);
+        }
+
         // Keep logs clean (max 50 lines)
         if (logWindow.children.length > 50) {
             logWindow.removeChild(logWindow.firstChild);
