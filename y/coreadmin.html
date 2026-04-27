@@ -62,7 +62,7 @@
 
     <div id="dashboard-wrapper" class="hidden">
         <div class="dashboard-container">
-            <header class="dashboard-header">
+                    <header class="dashboard-header">
                 <div class="brand">
                     <img src="assets/Pazhassiraja_College_Pulpally_Logo.png" alt="PRC Logo">
                     <div>
@@ -70,21 +70,25 @@
                         <span class="brand-subtitle">Fine Arts Administration Portal</span>
                     </div>
                 </div>
-                <div class="system-status">
-                    <div class="status-pill online">
-                        <span class="pulse-dot"></span>
-                        <i class="fas fa-network-wired"></i>
-                        <span>System Live</span>
+                    <div class="system-status">
+                        <a href="developer.html" class="dev-mode-toggle-wrap" style="text-decoration: none;">
+                            <i class="fas fa-terminal" style="font-size: 0.9rem; color: #34d399;"></i>
+                            <span class="toggle-label" style="color: #34d399;">Terminal</span>
+                        </a>
+                        <div class="status-pill online">
+                            <span class="pulse-dot"></span>
+                            <i class="fas fa-network-wired"></i>
+                            <span>System Live</span>
+                        </div>
+                        <div class="clock-wrap">
+                            <i class="far fa-clock"></i>
+                            <span id="clock">00:00:00</span>
+                        </div>
+                        <button id="logout-btn" class="logout-btn-premium" title="Secure Logout">
+                            <i class="fas fa-power-off"></i>
+                            <span>Logout</span>
+                        </button>
                     </div>
-                    <div class="clock-wrap">
-                        <i class="far fa-clock"></i>
-                        <span id="clock">00:00:00</span>
-                    </div>
-                    <button id="logout-btn" class="logout-btn-premium" title="Secure Logout">
-                        <i class="fas fa-power-off"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
             </header>
 
             <div class="dashboard-grid">
@@ -177,46 +181,6 @@
                         </div>
                     </div>
 
-                    <!-- Role Access Strategy Section -->
-                    <div class="admin-management-card">
-                        <div class="card-header">
-                            <h2 class="card-title">
-                                <i class="fas fa-layer-group"></i>
-                                Role Access Strategy
-                            </h2>
-                            <div class="header-actions">
-                                <span class="badge-count">System Configuration</span>
-                            </div>
-                        </div>
-
-                        <div class="permissions-container-premium">
-                            <div class="matrix-scroll-wrapper">
-                                <table class="permissions-matrix" id="permissions-matrix-table">
-                                    <!-- Matrix injected by JS -->
-                                    <thead>
-                                        <tr id="matrix-head-row">
-                                            <th>Module / Feature</th>
-                                            <!-- Roles injected here -->
-                                        </tr>
-                                    </thead>
-                                    <tbody id="matrix-body">
-                                        <!-- Rows injected here -->
-                                        <tr>
-                                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                <i class="fas fa-spinner fa-spin"></i> Building permission matrix...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div class="matrix-legend">
-                                <div class="legend-item"><i class="fas fa-check-circle" style="color: var(--accent);"></i> Full Access</div>
-                                <div class="legend-item"><i class="fas fa-times-circle" style="color: var(--error);"></i> No Access</div>
-                                <div class="legend-item"><i class="fas fa-info-circle" style="color: var(--text-secondary);"></i> Partial / Specialized</div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- System Configuration Section -->
                     <div class="admin-management-card">
@@ -261,20 +225,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Maintenance Mode Section -->
-                                <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.25rem;"><i class="fas fa-tools" style="color: #f59e0b; margin-right: 0.5rem;"></i>Maintenance Mode</h3>
-                                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Restrict public access to the main site. Admins will still have access to the Command Center.</p>
-                                        </div>
-                                        <button class="btn-primary" onclick="toggleMaintenanceMode()" id="maintenance-mode-btn"
-                                            style="background: rgba(255, 255, 255, 0.05); color: white; padding: 0.5rem 1.25rem; font-size: 0.85rem; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                            <i class="fas fa-spinner fa-spin"></i> Loading...
-                                        </button>
-                                    </div>
-                                    <div id="maintenance-status-msg" style="font-size: 0.75rem; color: var(--success); margin-top: 0.5rem; text-align: right; min-height: 15px;"></div>
-                                </div>
 
                                 <!-- Data Audit & Recovery Section -->
                                 <div class="audit-section" style="margin-top: 0; padding-top: 0; border-top: none;">
@@ -570,9 +520,8 @@
                 </div>
             </div>
 
-        </div>
-
-        <!-- Firebase SDKs -->
+        </div> <!-- End Dashboard Container -->
+    </div> <!-- End Dashboard Wrapper -->
         <script type="module" src="assets/coreadmin/coreadmin.js?v=5"></script>
 </body>
 

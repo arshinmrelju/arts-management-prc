@@ -1919,4 +1919,218 @@ select option {
 .role-sub { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
 .role-leaderboard { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
 .role-chest { background: rgba(236, 72, 153, 0.1); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.2); }
-.role-stagemanager { background: rgba(45, 212, 191, 0.1); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.2); }
+.role-stagemanager { background: rgba(45, 212, 191, 0.1); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.2); }
+
+
+/* --- Professional Management Dashboard Styles --- */
+.developer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+.terminal-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.terminal-path {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    margin-left: 1.5rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.75rem;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.exit-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.4);
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.exit-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.glitch-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.glass-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2rem;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(30, 41, 59, 0.6);
+}
+
+.card-inner {
+    padding: 2.5rem;
+}
+
+.icon-box {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    color: #3b82f6;
+}
+
+.badge-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.gate-status-panel {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.gate-toggle-btn {
+    background: #fff;
+    color: #0f172a;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.gate-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.terminal-log-window {
+    background: #020617;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: #94a3b8;
+    height: 200px;
+    overflow-y: auto;
+}
+
+.log-line {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    padding: 0.5rem 0;
+}
+
+.diag-card {
+    background: rgba(30, 41, 59, 0.3);
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.diag-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.diag-icon {
+    font-size: 1.25rem;
+    opacity: 0.5;
+}
+
+.diag-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+}
+
+.diag-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 1s ease;
+}
+
+.terminal-footer {
+    padding-top: 4rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    opacity: 0.3;
+    font-weight: 500;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: auto;
+}
+

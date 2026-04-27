@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Terminal | Union Arts PRC</title>
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/coreadmin/coreadmin.css?v=5">
+    
+    <style>
+        body {
+            background: #0b0f1a;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: #f8fafc;
+        }
+        .management-scene {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+
+<body>
+    <!-- Auth Guard Overlay -->
+    <div id="auth-guard" class="management-scene">
+        <div class="developer-area" style="text-align: center; max-width: 440px; padding: 4rem; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.05);">
+            <div style="width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 2rem;">
+                <i class="fas fa-lock fa-2x" style="color: #ef4444;"></i>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem;">Restricted Access</h1>
+            <p style="opacity: 0.6; font-size: 1rem; line-height: 1.6; margin-bottom: 2.5rem;">This area is reserved for senior system administrators. Please return to the main portal.</p>
+            <a href="coreadmin.html" class="btn-primary" style="background: #fff; color: #0f172a; padding: 1rem 2rem; border-radius: 1rem; font-weight: 700; text-decoration: none; display: block; transition: 0.3s;">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Main Developer Content -->
+    <div id="developer-content" class="hidden">
+        <div class="developer-container">
+            <header class="terminal-navbar">
+                <div class="nav-left">
+                    <div class="terminal-badge">MANAGEMENT PORTAL</div>
+                    <div class="terminal-path">System Control Center</div>
+                </div>
+                <div class="nav-right">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span id="system-uptime" style="font-weight: 600; color: #fff;">UPTIME: 04:22:15</span>
+                    </div>
+                    <a href="coreadmin.html" class="exit-btn">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </header>
+
+            <main class="terminal-body">
+                <section class="hero-section" style="margin-bottom: 3rem;">
+                    <h1 class="glitch-title" style="font-size: 2.5rem; text-shadow: none;">Override Center</h1>
+                    <p class="hero-subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 1rem auto 0; line-height: 1.6;">
+                        Secure management interface for global system states and performance metrics.
+                    </p>
+                </section>
+
+                <div class="dev-grid">
+                    <!-- Maintenance Control -->
+                    <div class="glass-card maintenance-card">
+                        <div class="card-inner">
+                            <div class="card-header-premium">
+                                <div class="title-wrap">
+                                    <div class="icon-box"><i class="fas fa-power-off"></i></div>
+                                    <h3>System Gate</h3>
+                                </div>
+                                <span class="badge-active">STABLE</span>
+                            </div>
+                            
+                            <div class="gate-status-panel">
+                                <div class="status-main">
+                                    <span class="status-label">GLOBAL MAINTENANCE STATE</span>
+                                    <h2 id="maintenance-status-msg" style="color: #10b981;">SYSTEM LIVE</h2>
+                                </div>
+                                <button class="gate-toggle-btn" id="maintenance-mode-btn" onclick="toggleMaintenanceMode()">
+                                    TOGGLE STATE
+                                </button>
+                            </div>
+                            <p class="gate-desc">Enable this to redirect public traffic to the standby page during updates.</p>
+                        </div>
+                    </div>
+
+                    <!-- System Events -->
+                    <div class="glass-card logs-card">
+                        <div class="card-inner">
+                            <div class="card-header-premium">
+                                <div class="title-wrap">
+                                    <div class="icon-box"><i class="fas fa-list-ul"></i></div>
+                                    <h3>Event Feed</h3>
+                                </div>
+                            </div>
+                            <div class="terminal-log-window" id="log-window">
+                                <div class="log-line">Initializing system feed...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic Grid -->
+                    <div class="diag-group">
+                        <div class="diag-card">
+                            <div class="diag-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="diag-info">
+                                <span class="diag-label">NETWORK LATENCY</span>
+                                <span class="diag-value" id="dev-latency">-- ms</span>
+                            </div>
+                            <div class="diag-bar"><div class="bar-fill" style="width: 65%; background: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);"></div></div>
+                        </div>
+                        <div class="diag-card">
+                            <div class="diag-icon"><i class="fas fa-database"></i></div>
+                            <div class="diag-info">
+                                <span class="diag-label">DATABASE UPTIME</span>
+                                <span class="diag-value">99.99% (V1)</span>
+                            </div>
+                            <div class="diag-bar"><div class="bar-fill" style="width: 98%; background: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);"></div></div>
+                        </div>
+                        <div class="diag-card">
+                            <div class="diag-icon"><i class="fas fa-globe-asia"></i></div>
+                            <div class="diag-info">
+                                <span class="diag-label">SERVICE REGION</span>
+                                <span class="diag-value">ASIA-SOUTH1</span>
+                            </div>
+                            <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="terminal-footer">
+                <div class="footer-left">UNION ARTS CORE v5.2</div>
+                <div class="footer-right">CONNECTED AS SUPER-ADMIN</div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="assets/coreadmin/developer.js?v=5"></script>
+</body>
+
+</html>

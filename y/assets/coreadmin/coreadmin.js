@@ -87,12 +87,11 @@ onAuthStateChanged(auth, async (user) => {
         // Initialize App
         fetchAdmins();
         fetchSystemYear();
-        fetchMaintenanceState();
         fetchArtsIdentity();
         fetchCertificateSettings();
         fetchPayments();
         calculateProjectUsage(); // Added this call
-        renderRoleAccessList(); 
+
         return;
     }
 
@@ -179,69 +178,8 @@ window.updateSystemYear = async function () {
     }
 };
 
-// Maintenance Mode Management
-window.fetchMaintenanceState = async function () {
-    const btn = document.getElementById('maintenance-mode-btn');
-    if (!btn) return;
-    try {
-        const docSnap = await getDoc(doc(db, "system_config", "maintenance"));
-        if (docSnap.exists() && docSnap.data().active) {
-            btn.innerHTML = '<i class="fas fa-toggle-on"></i> Disable Maintenance';
-            btn.style.background = 'rgba(239, 68, 68, 0.2)';
-            btn.style.color = '#fca5a5';
-            btn.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-            btn.dataset.state = 'active';
-        } else {
-            btn.innerHTML = '<i class="fas fa-toggle-off"></i> Enable Maintenance';
-            btn.style.background = 'rgba(255, 255, 255, 0.05)';
-            btn.style.color = 'white';
-            btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            btn.dataset.state = 'inactive';
-        }
-    } catch (err) {
-        console.error("Error fetching maintenance state:", err);
-        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-    }
-};
 
-window.toggleMaintenanceMode = async function () {
-    const btn = document.getElementById('maintenance-mode-btn');
-    const statusMsg = document.getElementById('maintenance-status-msg');
-    if (!btn) return;
-
-    const isCurrentlyActive = btn.dataset.state === 'active';
-    const newState = !isCurrentlyActive;
-    const actionText = newState ? 'enable' : 'disable';
-
-    if (!confirm(`Are you sure you want to ${actionText} maintenance mode?`)) return;
-
-    btn.disabled = true;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-
-    try {
-        await setDoc(doc(db, "system_config", "maintenance"), {
-            active: newState,
-            updatedAt: serverTimestamp(),
-            updatedBy: auth.currentUser.email
-        });
-        
-        statusMsg.textContent = `Maintenance mode ${newState ? 'enabled' : 'disabled'}!`;
-        statusMsg.style.color = newState ? '#fca5a5' : 'var(--success)';
-        
-        setTimeout(() => { statusMsg.textContent = ''; }, 3000);
-        
-        await window.fetchMaintenanceState();
-    } catch (err) {
-        console.error("Error updating maintenance mode:", err);
-        statusMsg.textContent = `Error: ${err.message}`;
-        statusMsg.style.color = 'var(--error)';
-        btn.innerHTML = originalText;
-    } finally {
-        btn.disabled = false;
-    }
-};
-
+// System Arts Identity Control
 // Data Audit & Migration Logic
 let auditData = {};
 
@@ -856,103 +794,6 @@ window.unlockSystemConfig = async function () {
     }
 };
 
-// Role Access Strategy Rendering
-window.renderRoleAccessList = async function() {
-    const headRow = id('matrix-head-row');
-    const matrixBody = id('matrix-body');
-    if (!headRow || !matrixBody) return;
-
-    // Fetch live permissions if possible
-    try {
-        const permSnap = await getDoc(doc(db, "admin_settings", "role_permissions"));
-        if (permSnap.exists()) {
-            ROLE_PERMISSIONS = permSnap.data();
-        } else {
-            // First time setup: Save defaults to Firestore
-            await setDoc(doc(db, "admin_settings", "role_permissions"), ROLE_PERMISSIONS);
-        }
-    } catch (e) {
-        console.error("Error fetching permissions:", e);
-    }
-
-    // Build header (Roles)
-    headRow.innerHTML = '<th>Module / Feature</th>';
-    const roles = Object.keys(ROLE_PERMISSIONS);
-    roles.forEach(role => {
-        const th = document.createElement('th');
-        th.style.textAlign = 'center';
-        th.innerHTML = `
-            <div class="role-th-wrap">
-                <span class="admin-role-badge role-${role.toLowerCase().replace(' ', '')}">${role}</span>
-            </div>
-        `;
-        headRow.appendChild(th);
-    });
-
-    // Build rows (Modules)
-    matrixBody.innerHTML = '';
-    const modules = Object.keys(ALL_MODULES_LABELS);
-    
-    modules.forEach(modKey => {
-        const tr = document.createElement('tr');
-        const labelCell = document.createElement('td');
-        labelCell.textContent = ALL_MODULES_LABELS[modKey];
-        tr.appendChild(labelCell);
-
-        roles.forEach(role => {
-            const td = document.createElement('td');
-            td.className = 'perm-cell';
-            const hasAccess = ROLE_PERMISSIONS[role].includes(modKey);
-            
-            const icon = document.createElement('i');
-            icon.className = hasAccess ? 'fas fa-check-circle' : 'fas fa-times-circle';
-            icon.style.color = hasAccess ? 'var(--accent)' : 'rgba(255,255,255,0.05)';
-            icon.style.cursor = 'pointer';
-            icon.style.transition = 'all 0.2s ease';
-            
-            icon.onclick = () => togglePermission(role, modKey, icon);
-            
-            td.appendChild(icon);
-            tr.appendChild(td);
-        });
-        
-        matrixBody.appendChild(tr);
-    });
-};
-
-window.togglePermission = async function(role, modKey, iconEl) {
-    const originalClass = iconEl.className;
-    iconEl.className = 'fas fa-spinner fa-spin';
-    iconEl.style.color = 'var(--text-secondary)';
-
-    try {
-        // Toggle Local State
-        let currentPerms = ROLE_PERMISSIONS[role] || [];
-        if (currentPerms.includes(modKey)) {
-            currentPerms = currentPerms.filter(p => p !== modKey);
-        } else {
-            currentPerms.push(modKey);
-        }
-        ROLE_PERMISSIONS[role] = currentPerms;
-
-        // Save to Firestore
-        await setDoc(doc(db, "admin_settings", "role_permissions"), ROLE_PERMISSIONS);
-        
-        // Success: Update UI
-        const isNowAllowed = currentPerms.includes(modKey);
-        iconEl.className = isNowAllowed ? 'fas fa-check-circle' : 'fas fa-times-circle';
-        iconEl.style.color = isNowAllowed ? 'var(--accent)' : 'rgba(255,255,255,0.05)';
-        
-        // Brief pulse effect
-        iconEl.style.transform = 'scale(1.3)';
-        setTimeout(() => iconEl.style.transform = 'scale(1)', 200);
-
-    } catch (e) {
-        console.error("Save Permission Error:", e);
-        iconEl.className = originalClass;
-        alert("Failed to update permission: " + e.message);
-    }
-};
 
 // Allow pressing Enter to unlock
 document.getElementById('config-pin-input').addEventListener('keypress', function (e) {
@@ -1139,3 +980,6 @@ window.calculateProjectUsage = async function () {
         firestoreText.style.color = "#ef4444";
     }
 };
+
+
+
