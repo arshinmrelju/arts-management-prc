@@ -366,6 +366,79 @@
       animation: fadeInUp 1s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
+    /* Hamburger Menu Button */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile Navigation Drawer */
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 75%;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      padding: 7rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-nav.active { right: 0; }
+
+    .mobile-nav a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .nav-overlay.active { display: block; opacity: 1; }
+
     .hero-decorations {
       height: 60px;
       width: 100%;
@@ -540,11 +613,49 @@
       animation: fadeInUp 0.5s ease backwards;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
       .leaderboard-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      header nav { display: none; }
+      .hamburger { display: flex; }
+      .logo { font-size: 1.1rem; }
+      .logo img { height: 32px; }
+      .live-indicator { display: none; }
+      
+      .hero-title {
+        font-size: 2.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .hero-subtitle {
+        font-size: 0.85rem;
+        letter-spacing: 0.2em;
+      }
+      .hero-container {
+        padding: 4rem 1rem 2rem;
+      }
+      .view-toggle {
+        top: 5rem;
+        padding: 0.3rem;
+        margin-bottom: 2rem;
+      }
+      .toggle-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .rank-card {
+        padding: 1rem;
         gap: 1rem;
       }
+      .rank-badge {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+      }
+      .dept-name { font-size: 0.95rem; }
+      .dept-score { font-size: 1.35rem; }
     }
 
     .rank-card {
@@ -1155,7 +1266,19 @@
       <a href="/index.html#events">Events</a>
       <a href="/leaderboard.html" style="color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5);">Leaderboard</a>
     </nav>
+    <div class="hamburger" id="hamburger-menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </header>
+
+  <div class="mobile-nav" id="mobile-drawer">
+    <a href="/" class="mobile-link">Home</a>
+    <a href="/index.html#events" class="mobile-link">Events</a>
+    <a href="/leaderboard.html" class="mobile-link" style="color: white; font-weight: 700;">Leaderboard</a>
+  </div>
+  <div class="nav-overlay" id="mobile-overlay"></div>
 
   <main>
     <div class="hero-container">
@@ -1220,7 +1343,6 @@
     window.app = initializeApp(firebaseConfig);
     window.db = getFirestore(window.app);
     let systemYear = '2025-26'; // Default
-
     let pointsListener = null;
     let logsListener = null;
 
@@ -1242,6 +1364,29 @@
         itemsView.classList.remove('hidden');
       }
     };
+
+    // Mobile Nav Logic
+    const hamburger = document.getElementById('hamburger-menu');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    const toggleMobileNav = () => {
+      if (!hamburger || !mobileDrawer || !mobileOverlay) return;
+      hamburger.classList.toggle('active');
+      mobileDrawer.classList.toggle('active');
+      mobileOverlay.classList.toggle('active');
+      document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+    };
+
+    if (hamburger && mobileDrawer && mobileOverlay) {
+      hamburger.addEventListener('click', toggleMobileNav);
+      mobileOverlay.addEventListener('click', toggleMobileNav);
+    }
+
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', toggleMobileNav);
+    });
 
     // Fetch system year first
     async function init() {
