@@ -294,9 +294,7 @@ async function autoAssignDepartment(email) {
 
         if (whitelistSnap.exists() && whitelistSnap.data().department) {
             deptField.value = whitelistSnap.data().department;
-            deptField.setAttribute('value', deptField.value);
-            deptField.classList.add('has-value');
-            populatePrograms(deptField.value);
+            deptField.dispatchEvent(new Event('change'));
             return;
         }
 
@@ -322,9 +320,7 @@ async function autoAssignDepartment(email) {
                         }
                     }
                 }
-                deptField.setAttribute('value', deptField.value);
-                deptField.classList.toggle('has-value', deptField.value !== "");
-                if (deptField.value) populatePrograms(deptField.value);
+                deptField.dispatchEvent(new Event('change'));
             }
         }
     } catch (error) {
