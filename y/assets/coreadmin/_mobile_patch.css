@@ -1,0 +1,211 @@
+/* =================================================================
+   MOBILE RESPONSIVE -- KING TERMINAL
+   768px tablet/phone  |  480px small phone  |  360px tiny phone
+================================================================= */
+
+/* ─────────────────── 768 px ─────────────────── */
+@media (max-width: 768px) {
+
+    /* Container */
+    .developer-container {
+        padding: 0.85rem;
+        gap: 1.5rem;
+    }
+
+    /* Navbar */
+    .terminal-navbar {
+        padding: 0.7rem 0.9rem;
+        gap: 0.6rem;
+    }
+    .nav-left { gap: 0.65rem; }
+    .terminal-path { display: none; }
+    .nav-right { gap: 0.75rem; }
+    .status-indicator { font-size: 0.7rem; gap: 0.45rem; }
+
+    /* Hero */
+    .hero-section { padding: 0 0.25rem; }
+    .king-crown { font-size: 2.4rem; }
+    .king-greeting { font-size: 0.7rem; letter-spacing: 0.18em; }
+    .glitch-title { font-size: clamp(1.9rem, 9.5vw, 3rem); }
+    .hero-subtitle {
+        font-size: 0.86rem;
+        padding: 0 0.25rem;
+        margin-top: 0.8rem;
+    }
+    .royal-divider { margin-bottom: 1.25rem; }
+
+    /* Dev Grid — single column */
+    .dev-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+
+    /* Glass Cards */
+    .glass-card { padding: 1.25rem; border-radius: 1.15rem; }
+    .card-inner { gap: 1.1rem; }
+
+    /* Gate Status Panel — stack vertically */
+    .gate-status-panel {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.1rem;
+        padding: 1.25rem;
+    }
+    #maintenance-status-msg { font-size: 1.1rem; }
+    .gate-toggle-btn {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    /* Log window */
+    .terminal-log-window { height: 180px; }
+
+    /* Diagnostics — single column, horizontal layout per card */
+    .diag-group {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+        grid-column: 1 / -1;
+    }
+    .diag-card {
+        padding: 1rem 1.2rem;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+    .diag-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .diag-info {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    /* Pages section */
+    .pages-section-header { flex-wrap: wrap; gap: 0.6rem; }
+    .pages-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
+    }
+    .page-card { padding: 1rem; gap: 0.55rem; }
+
+    /* Dev Wall header */
+    .devwall-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+    .devwall-add-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Dev Wall board */
+    .devwall-board {
+        padding: 1.25rem 0.85rem;
+        min-height: 160px;
+    }
+
+    /* Sticky notes — 2-column grid */
+    .devwall-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem 1rem;
+        justify-items: center;
+        align-items: start;
+    }
+    .sticky-note {
+        width: 100%;
+        max-width: 165px;
+        min-height: 150px;
+        transform: none !important;
+    }
+    .sticky-note:hover {
+        transform: translateY(-4px) scale(1.03) !important;
+    }
+
+    /* Compose modal */
+    .devwall-compose {
+        padding: 1.4rem;
+        max-width: 100%;
+        border-radius: 1.25rem;
+    }
+    .compose-footer { flex-wrap: wrap; gap: 0.65rem; }
+    .compose-save-btn { width: 100%; justify-content: center; }
+
+    /* Footer */
+    .terminal-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        padding: 1rem 0;
+        font-size: 0.62rem;
+    }
+}
+
+/* ─────────────────── 480 px ─────────────────── */
+@media (max-width: 480px) {
+
+    .developer-container { padding: 0.65rem; gap: 1.1rem; }
+
+    /* Navbar compact */
+    .terminal-navbar { padding: 0.6rem 0.75rem; }
+    .terminal-badge { font-size: 0.6rem; padding: 0.22rem 0.6rem; }
+    #system-uptime { display: none; }
+
+    /* Hero */
+    .king-crown { font-size: 2rem; margin-bottom: 0.5rem; }
+    .king-greeting { font-size: 0.62rem; letter-spacing: 0.12em; }
+    .glitch-title { font-size: clamp(1.6rem, 11vw, 2.4rem); }
+    .hero-subtitle { font-size: 0.8rem; line-height: 1.65; }
+
+    /* Cards */
+    .glass-card { padding: 1rem; border-radius: 0.9rem; }
+    .icon-box { width: 38px; height: 38px; font-size: 0.95rem; border-radius: 0.75rem; }
+    .title-wrap h3 { font-size: 0.95rem; }
+    .title-wrap { gap: 0.85rem; }
+
+    /* Gate */
+    #maintenance-status-msg { font-size: 1rem; }
+    .gate-toggle-btn { font-size: 0.75rem; padding: 0.8rem; }
+
+    /* Log */
+    .terminal-log-window { height: 160px; font-size: 0.7rem; padding: 1rem; }
+
+    /* Diag */
+    .diag-card { padding: 0.9rem 1rem; }
+    .diag-value { font-size: 1rem; }
+
+    /* Pages — single column */
+    .pages-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .page-card { padding: 0.9rem; }
+    .page-name { font-size: 0.88rem; }
+    .page-desc { font-size: 0.76rem; }
+
+    /* Dev Wall */
+    .devwall-board { padding: 1rem 0.65rem; min-height: 120px; }
+    .devwall-grid { gap: 1.1rem 0.75rem; }
+    .sticky-note {
+        max-width: 148px;
+        min-height: 130px;
+        padding: 2rem 0.85rem 0.85rem;
+    }
+
+    /* Compose */
+    .devwall-compose { padding: 1.1rem; border-radius: 1rem; }
+    .note-title-input,
+    .note-body-input { font-size: 0.84rem; padding: 0.75rem; }
+}
+
+/* ─────────────────── 360 px (very small) ─────────────────── */
+@media (max-width: 360px) {
+
+    .developer-container { padding: 0.5rem; }
+    .glitch-title { font-size: clamp(1.45rem, 12vw, 2rem); }
+    .pages-grid { grid-template-columns: 1fr; }
+    .devwall-grid { grid-template-columns: 1fr; }
+    .sticky-note { max-width: 220px; width: 100%; }
+}

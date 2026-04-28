@@ -1,11 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { firebaseConfig } from "../core/firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+window.auth = auth;
 
 const ADMIN_EMAILS = [
     "collageunionprc@gmail.com",
@@ -60,55 +61,39 @@ function startUptimeCounter() {
     }, 1000);
 }
 
-// Terminal Logs simulation
+// Real-time Visitor Logs
 function initTerminalLogs() {
     const logWindow = document.getElementById('log-window');
-    const logs = [
-        "♛ Sovereign session authenticated — throne secured",
-        "⚔ Security perimeter scan: 0 breaches detected",
-        "✦ Firestore vault synchronized — all records sealed",
-        "⚡ Background herald 'mail-service' standing by",
-        "♛ Cache purged — kingdom reindexed at full speed",
-        "✦ Database shard A-1 answering the royal call",
-        "⚔ Garbage sweep complete — all debris cleared",
-        "⚡ Network watchmen report: latency nominal",
-        "♛ Optimization decree enacted — index rebuilt",
-        "✦ Memory garrison: all walls holding strong",
-        "⚔ Auth tower confirmed: zero imposters detected",
-        "⚡ System heartbeat: steady as the crown endures"
-    ];
+    logWindow.innerHTML = '<div class="log-line">Connecting to Central Archive Feed...</div>';
 
-    setInterval(() => {
-        const line = document.createElement('div');
-        line.className = 'log-line';
-        line.style.opacity = '0';
-        line.style.transform = 'translateY(10px)';
-        line.style.transition = 'all 0.3s ease';
+    const logsQuery = query(collection(db, "visitor_logs"), orderBy("timestamp", "desc"), limit(50));
+
+    onSnapshot(logsQuery, (snapshot) => {
+        logWindow.innerHTML = ''; // Clear window to rebuild ordered list
         
-        const timestamp = new Date().toLocaleTimeString();
-        line.textContent = `[${timestamp}] > ${logs[Math.floor(Math.random() * logs.length)]}`;
-        logWindow.appendChild(line);
+        const docs = [];
+        snapshot.forEach(doc => docs.push(doc.data()));
         
-        // Trigger animation
-        setTimeout(() => {
-            line.style.opacity = '1';
-            line.style.transform = 'translateY(0)';
-        }, 10);
+        // Render in reverse so newest is at the bottom (or top depending on preference)
+        // Standard terminal logs usually have newest at bottom. We queried desc to get the 50 newest, so let's reverse them to print chronologically.
+        docs.reverse().forEach(data => {
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            
+            const timeStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : "Pending";
+            const ip = data.ip || "Unknown IP";
+            const device = data.device || "Unknown Device";
+            const page = data.page || "Unknown Page";
+
+            line.textContent = `[${timeStr}] > ${ip} | ${device} | ${page}`;
+            logWindow.appendChild(line);
+        });
 
         logWindow.scrollTop = logWindow.scrollHeight;
-        
-        // Random Glitch on title
-        if (Math.random() > 0.9) {
-            const title = document.querySelector('.glitch-title');
-            title.style.animation = 'none';
-            setTimeout(() => title.style.animation = '', 100);
-        }
-
-        // Keep logs clean (max 50 lines)
-        if (logWindow.children.length > 50) {
-            logWindow.removeChild(logWindow.firstChild);
-        }
-    }, 4000);
+    }, (error) => {
+        console.error("Error fetching visitor logs:", error);
+        logWindow.innerHTML = '<div class="log-line" style="color: red;">Error: Archive connection severed.</div>';
+    });
 }
 
 // Maintenance Mode Logic
@@ -122,26 +107,28 @@ window.fetchMaintenanceState = async function () {
         const isActive = configDoc.exists() ? configDoc.data().active : false;
 
         if (isActive) {
-            btn.innerHTML = '<div class="btn-ripple"></div><span class="btn-text">OPEN GATE</span>';
-            btn.style.background = '#ef4444';
-            btn.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.4)';
+            btn.innerHTML = '<span class="btn-text">OPEN GATE</span>';
+            btn.className = 'gate-toggle-btn btn-open';
             statusMsg.textContent = "MAINTENANCE ACTIVE";
             statusMsg.style.color = "#ef4444";
             if (badge) {
                 badge.textContent = "UNLOCKED";
-                badge.style.background = "rgba(239, 68, 68, 0.1)";
+                badge.className = "badge-active role-public"; // Using an existing role class or just reset
+                badge.style.background = "rgba(239,68,68,0.15)";
                 badge.style.color = "#ef4444";
+                badge.style.borderColor = "rgba(239,68,68,0.3)";
             }
         } else {
-            btn.innerHTML = '<div class="btn-ripple"></div><span class="btn-text">LOCK GATE</span>';
-            btn.style.background = '#34d399';
-            btn.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.4)';
+            btn.innerHTML = '<span class="btn-text">LOCK GATE</span>';
+            btn.className = 'gate-toggle-btn btn-locked';
             statusMsg.textContent = "SYSTEM LIVE";
-            statusMsg.style.color = "#34d399";
+            statusMsg.style.color = "#10b981";
             if (badge) {
                 badge.textContent = "LOCKED";
-                badge.style.background = "rgba(52, 211, 153, 0.1)";
-                badge.style.color = "#34d399";
+                badge.className = "badge-active role-admin";
+                badge.style.background = "rgba(16,185,129,0.15)";
+                badge.style.color = "#10b981";
+                badge.style.borderColor = "rgba(16,185,129,0.3)";
             }
         }
     } catch (e) {

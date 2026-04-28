@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Terminal | Union Arts PRC</title>
+    <title>Central Archives | Union Arts PRC</title>
     <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="apple-touch-icon" href="/assets/favicon.png">
 
@@ -15,23 +15,23 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/coreadmin/coreadmin.css?v=5">
-    <link rel="stylesheet" href="assets/coreadmin/developer_terminal.css?v=7">
+    <link rel="stylesheet" href="assets/coreadmin/developer_terminal.css?v=13">
 </head>
 
 <body class="developer-terminal">
 
     <!-- Gold Particle Canvas -->
-    <canvas id="king-particles"></canvas>
+    <canvas id="leader-particles"></canvas>
 
     <!-- Auth Guard Overlay -->
     <div id="auth-guard" class="management-scene hidden">
-        <div class="developer-area" style="text-align: center; max-width: 440px; padding: 4rem; background: rgba(8,14,28,0.9); backdrop-filter: blur(30px); border-radius: 2rem; border: 1px solid rgba(245,200,66,0.12); box-shadow: 0 0 80px rgba(245,200,66,0.05);">
+        <div class="developer-area" style="text-align: center; max-width: 440px; padding: 4rem; background: rgba(8,14,28,0.9); backdrop-filter: blur(30px); border-radius: 2rem; border: 1px solid rgba(212,196,168,0.12); box-shadow: 0 0 80px rgba(212,196,168,0.05);">
             <div style="width: 80px; height: 80px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 2rem; box-shadow: 0 0 30px rgba(239,68,68,0.1);">
                 <i class="fas fa-lock fa-2x" style="color: #ef4444;"></i>
             </div>
             <h1 style="font-family:'Cinzel',serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 1rem; letter-spacing:0.04em;">Restricted Access</h1>
             <p style="opacity: 0.55; font-size: 0.95rem; line-height: 1.7; margin-bottom: 2.5rem;">This sanctum is reserved for the sovereign administrators. Return to the main portal.</p>
-            <a href="coreadmin.html" style="background: linear-gradient(135deg,rgba(245,200,66,0.15),rgba(245,200,66,0.05)); color: #f5c842; border: 1px solid rgba(245,200,66,0.3); padding: 1rem 2rem; border-radius: 0.85rem; font-family:'JetBrains Mono',monospace; font-weight: 700; font-size:0.85rem; letter-spacing:0.1em; text-decoration: none; display: block; transition: 0.3s; text-shadow:0 0 12px rgba(245,200,66,0.4);">← BACK TO DASHBOARD</a>
+            <a href="coreadmin.html" style="background: linear-gradient(135deg,rgba(212,196,168,0.15),rgba(212,196,168,0.05)); color: #f5c842; border: 1px solid rgba(212,196,168,0.3); padding: 1rem 2rem; border-radius: 0.85rem; font-family:'JetBrains Mono',monospace; font-weight: 700; font-size:0.85rem; letter-spacing:0.1em; text-decoration: none; display: block; transition: 0.3s; text-shadow:0 0 12px rgba(212,196,168,0.4);">← BACK TO DASHBOARD</a>
         </div>
     </div>
 
@@ -39,32 +39,33 @@
     <div id="developer-content" class="hidden">
         <div class="developer-container">
 
-            <!-- Navbar -->
-            <header class="terminal-navbar">
-                <div class="nav-left">
-                    <div class="terminal-badge">⚡ SOVEREIGN TERMINAL</div>
-                    <div class="terminal-path">/ system / override-center / root</div>
+            <!-- Newspaper Top Bar -->
+            <div class="newspaper-top-bar">
+                <div class="ntb-left">
+                    <span id="system-uptime" class="ntb-date">UPTIME: 00:00:00</span>
                 </div>
-                <div class="nav-right">
-                    <div class="status-indicator">
-                        <span class="status-dot"></span>
-                        <span id="system-uptime" style="font-weight: 600; color: #fff;">UPTIME: 00:00:00</span>
-                    </div>
-                    <a href="coreadmin.html" class="exit-btn" title="Exit Terminal">
-                        <i class="fas fa-times"></i>
-                    </a>
+                <div class="ntb-center">
+                    THE UNION ARTS LEDGER
                 </div>
-            </header>
+                <div class="ntb-right">
+                    <span class="ntb-price">ROOT ACCESS</span>
+                    <button class="ntb-exit-btn" onclick="auth.signOut()" title="Secure Exit">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+            </div>
+
 
             <!-- Hero -->
             <main class="terminal-body">
                 <section class="hero-section">
-                    <span class="king-crown">♛</span>
-                    <div class="king-greeting">All systems kneel before you</div>
-                    <h1 class="glitch-title" data-text="Override Center">Override Center</h1>
+                    <img src="assets/Pazhassiraja_College_Pulpally_Logo.png" alt="College Logo" style="height: 110px; margin: 0 auto 1rem; filter: sepia(0.8) hue-rotate(-20deg) brightness(0.9) contrast(1.1) opacity(0.9); display: block;">
+                    <div class="leader-greeting">Preserving the system ledgers</div>
+                    <h1 class="glitch-title" data-text="Central Archives">Central Archives</h1>
+                    <div id="archive-date" style="font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.15em; color: var(--dev-text-muted); margin-top: 0.5rem; text-transform: uppercase;">ISSUE NO. 01 — VOL. V — THE PRESERVATION EPOCH</div>
                     <p class="hero-subtitle">
-                        You hold absolute command over every system, every gate, every state.
-                        This is your throne room.
+                        Ancillary records of all architecture, events, and data.
+                        This is the main ledger.
                     </p>
                     <div class="royal-divider">
                         <span class="royal-divider-gem">◆</span>
@@ -102,11 +103,11 @@
                             <div class="card-header-premium">
                                 <div class="title-wrap">
                                     <div class="icon-box"><i class="fas fa-scroll"></i></div>
-                                    <h3>Royal Dispatch</h3>
+                                    <h3>Visitor Ledger</h3>
                                 </div>
                             </div>
                             <div class="terminal-log-window" id="log-window">
-                                <div class="log-line">Initializing sovereign feed...</div>
+                                <div class="log-line">Initializing telemetry feed...</div>
                             </div>
                         </div>
                     </div>
@@ -119,7 +120,7 @@
                                 <span class="diag-label">Network Latency</span>
                                 <span class="diag-value" id="dev-latency">-- ms</span>
                             </div>
-                            <div class="diag-bar"><div class="bar-fill" style="width: 65%; background: linear-gradient(90deg,#3b82f6,#6366f1); box-shadow: 0 0 12px rgba(59,130,246,0.5);"></div></div>
+                            <div class="diag-bar"><div class="bar-fill" style="width: 65%; background: linear-gradient(90deg,#3b82f6,#6366f1); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
                         </div>
                         <div class="diag-card">
                             <div class="diag-icon"><i class="fas fa-database"></i></div>
@@ -135,19 +136,19 @@
                                 <span class="diag-label">Service Region</span>
                                 <span class="diag-value">ASIA-SOUTH1</span>
                             </div>
-                            <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#f5c842,#b8922e); box-shadow: 0 0 12px rgba(245,200,66,0.5);"></div></div>
+                            <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#f5c842,#b8922e); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ♛ Kingdom Pages -->
+                <!-- ✦ Project Architecture -->
                 <section class="pages-section">
                     <div class="pages-section-header">
                         <div class="title-wrap">
                             <div class="icon-box"><i class="fas fa-map"></i></div>
                             <div>
-                                <h2 class="pages-section-title">Kingdom Pages</h2>
-                                <p class="pages-section-sub">All routes under sovereign command</p>
+                                <h2 class="pages-section-title">Project Architecture</h2>
+                                <p class="pages-section-sub">All routes under strategic orchestration</p>
                             </div>
                         </div>
                         <div class="pages-count-badge">10 PAGES</div>
@@ -294,11 +295,11 @@
                         <div class="page-card page-card-current">
                             <div class="page-card-top">
                                 <div class="page-icon"><i class="fas fa-terminal"></i></div>
-                                <span class="page-role-badge role-root">ROOT</span>
+                                <span class="page-role-badge role-lead">LEAD</span>
                             </div>
                             <div class="page-name">Developer Terminal <span class="current-tag">YOU ARE HERE</span></div>
                             <div class="page-route">/ developer.html</div>
-                            <p class="page-desc">Sovereign override center — system gates, diagnostics, and root controls.</p>
+                            <p class="page-desc">Strategic command center — system gates, diagnostics, and core controls.</p>
                             <div class="page-meta">
                                 <span class="page-size"><i class="fas fa-weight-hanging"></i> 11 KB</span>
                                 <span class="page-open-btn page-open-disabled">CURRENT</span>
@@ -307,11 +308,59 @@
 
                     </div>
                 </section>
+
+                <!-- ✦ Dev Wall — Private Notes -->
+                <section class="devwall-section">
+                    <div class="devwall-header">
+                        <div class="title-wrap">
+                            <div class="icon-box"><i class="fas fa-thumbtack"></i></div>
+                            <div>
+                                <h2 class="devwall-title">Dev Wall</h2>
+                                <p class="devwall-sub">Private · Lives in your browser · Never synced</p>
+                            </div>
+                        </div>
+                        <button class="devwall-add-btn" id="devwall-add-btn" onclick="devWall.openCompose()">
+                            <i class="fas fa-plus"></i> New Note
+                        </button>
+                    </div>
+
+                    <!-- Compose Modal -->
+                    <div class="devwall-compose-overlay hidden" id="devwall-compose-overlay" onclick="devWall.closeOnOverlay(event)">
+                        <div class="devwall-compose" id="devwall-compose">
+                            <div class="compose-header">
+                                <span class="compose-title">Pin a Note</span>
+                                <button class="compose-close" onclick="devWall.closeCompose()"><i class="fas fa-times"></i></button>
+                            </div>
+                            <input type="text" id="note-title-input" class="note-title-input" placeholder="Title (optional)..." maxlength="60">
+                            <textarea id="note-body-input" class="note-body-input" placeholder="What's on your mind..." rows="6" maxlength="800"></textarea>
+                            <div class="compose-footer">
+                                <div class="color-picker" id="color-picker">
+                                    <span class="color-dot active" data-color="gold"   style="background:#93c5fd;" onclick="devWall.pickColor(this)"></span>
+                                    <span class="color-dot"        data-color="green"  style="background:#b6f0b0;" onclick="devWall.pickColor(this)"></span>
+                                    <span class="color-dot"        data-color="blue"   style="background:#a8d8f8;" onclick="devWall.pickColor(this)"></span>
+                                    <span class="color-dot"        data-color="red"    style="background:#ffaaaa;" onclick="devWall.pickColor(this)"></span>
+                                    <span class="color-dot"        data-color="purple" style="background:#dbb6f8;" onclick="devWall.pickColor(this)"></span>
+                                    <span class="color-dot"        data-color="slate"  style="background:#e2e8f0;" onclick="devWall.pickColor(this)"></span>
+                                </div>
+                                <button class="compose-save-btn" onclick="devWall.saveNote()"><i class="fas fa-thumbtack"></i> Pin it</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Board -->
+                    <div class="devwall-board">
+                        <div class="devwall-grid" id="devwall-grid"></div>
+                        <div class="devwall-empty hidden" id="devwall-empty">
+                            <i class="fas fa-thumbtack"></i>
+                            <p>Your wall is empty — pin your first thought</p>
+                        </div>
+                    </div>
+                </section>
             </main>
 
             <footer class="terminal-footer">
-                <div class="footer-left">UNION ARTS CORE v5.2 — KING BUILD</div>
-                <div class="footer-right">CONNECTED AS SOVEREIGN ROOT</div>
+                <div class="footer-left">UNION ARTS CORE v5.2 — ARCHIVE BUILD</div>
+                <div class="footer-right">CONNECTED AS HEAD ARCHIVIST</div>
             </footer>
         </div>
     </div>
@@ -319,7 +368,7 @@
     <!-- Gold Particle System -->
     <script>
     (function () {
-        const canvas = document.getElementById('king-particles');
+        const canvas = document.getElementById('leader-particles');
         const ctx = canvas.getContext('2d');
         let particles = [];
         const COUNT = 55;
@@ -334,10 +383,10 @@
         function rand(min, max) { return Math.random() * (max - min) + min; }
 
         const GOLDS = [
-            'rgba(245,200,66,',
-            'rgba(253,230,138,',
-            'rgba(184,146,46,',
-            'rgba(255,235,150,'
+            'rgba(212,196,168,',
+            'rgba(244,235,216,',
+            'rgba(139,115,85,',
+            'rgba(212,196,168,'
         ];
 
         function createParticle() {
@@ -383,6 +432,142 @@
 
     <!-- Firebase SDKs -->
     <script type="module" src="assets/coreadmin/developer.js?v=6"></script>
+
+    <!-- Dev Wall — Private Notes (localStorage only) -->
+    <script>
+    const devWall = (() => {
+        const STORAGE_KEY = 'devwall_notes_v1';
+        let notes = [];
+        let selectedColor = 'gold';
+
+        // Random rotation sets for note variety
+        const ROTATIONS = [-3, -2, -1.5, -1, 0.5, 1, 1.5, 2, 2.5, 3];
+
+        function load() {
+            try { notes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+            catch { notes = []; }
+        }
+
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        }
+
+        function fmt(ts) {
+            const d = new Date(ts);
+            return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+                + ' · ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+        }
+
+        function render() {
+            const grid  = document.getElementById('devwall-grid');
+            const empty = document.getElementById('devwall-empty');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            if (notes.length === 0) {
+                empty && empty.classList.remove('hidden');
+                return;
+            }
+            empty && empty.classList.add('hidden');
+
+            [...notes].reverse().forEach((n, i) => {
+                const rot      = ROTATIONS[i % ROTATIONS.length];
+                const hoverRot = rot > 0 ? rot - 1 : rot + 1;
+                const card = document.createElement('div');
+                card.className = `sticky-note nc-${n.color}`;
+                card.style.setProperty('--note-rotate',       `rotate(${rot}deg)`);
+                card.style.setProperty('--note-hover-rotate', `rotate(${hoverRot}deg)`);
+                card.style.transform = `rotate(${rot}deg)`;
+                card.innerHTML = `
+                    <div class="note-paper"></div>
+                    <div class="note-pin">
+                        <div class="pin-head"></div>
+                        <div class="pin-shaft"></div>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-header">
+                            ${n.title ? `<div class="note-card-title">${escHtml(n.title)}</div>` : '<div></div>'}
+                            <button class="note-delete-btn" title="Remove" onclick="devWall.deleteNote('${n.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="note-body">${escHtml(n.body)}</div>
+                        <div class="note-timestamp">${fmt(n.ts)}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function escHtml(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function openCompose() {
+            const overlay = document.getElementById('devwall-compose-overlay');
+            document.getElementById('note-title-input').value = '';
+            document.getElementById('note-body-input').value = '';
+            pickColorByKey('gold');
+            overlay.classList.remove('hidden');
+            setTimeout(() => document.getElementById('note-body-input').focus(), 120);
+        }
+
+        function closeCompose() {
+            document.getElementById('devwall-compose-overlay').classList.add('hidden');
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target === document.getElementById('devwall-compose-overlay')) closeCompose();
+        }
+
+        function pickColor(dotEl) {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            dotEl.classList.add('active');
+            selectedColor = dotEl.dataset.color;
+        }
+
+        function pickColorByKey(key) {
+            selectedColor = key;
+            document.querySelectorAll('.color-dot').forEach(d => {
+                d.classList.toggle('active', d.dataset.color === key);
+            });
+        }
+
+        function saveNote() {
+            const title = document.getElementById('note-title-input').value.trim();
+            const body  = document.getElementById('note-body-input').value.trim();
+            if (!body) {
+                document.getElementById('note-body-input').focus();
+                document.getElementById('note-body-input').style.borderColor = 'rgba(239,68,68,0.4)';
+                setTimeout(() => document.getElementById('note-body-input').style.borderColor = '', 1200);
+                return;
+            }
+            notes.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2), title, body, color: selectedColor, ts: Date.now() });
+            save();
+            render();
+            closeCompose();
+        }
+
+        function deleteNote(id) {
+            notes = notes.filter(n => n.id !== id);
+            save();
+            render();
+        }
+
+        // Keyboard shortcut: Escape closes compose
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeCompose();
+        });
+
+        // Init on page load
+        document.addEventListener('DOMContentLoaded', () => { load(); render(); });
+        // Also init if DOM is already ready (module timing)
+        if (document.readyState !== 'loading') { load(); render(); }
+
+        return { openCompose, closeCompose, closeOnOverlay, pickColor, saveNote, deleteNote };
+    })();
+    </script>
 </body>
+
 
 </html>

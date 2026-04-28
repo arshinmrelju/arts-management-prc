@@ -105,6 +105,11 @@ service cloud.firestore {
       allow create: if isAuthenticated();
     }
 
+    match /visitor_logs/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // --- CATCH-ALL ---
     match /{document=**} {
       allow read: if true;
