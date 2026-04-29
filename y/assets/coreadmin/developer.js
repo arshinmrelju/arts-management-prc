@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { firebaseConfig } from "../core/firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
@@ -15,10 +15,15 @@ const ADMIN_EMAILS = [
 
 onAuthStateChanged(auth, async (user) => {
     const authGuard = document.getElementById('auth-guard');
+    const authLogin = document.getElementById('auth-login');
+    const authUnauthorized = document.getElementById('auth-unauthorized');
     const content = document.getElementById('developer-content');
 
     if (!user) {
-        window.location.href = "coreadmin.html";
+        authGuard.classList.remove('hidden');
+        authLogin.classList.remove('hidden');
+        authUnauthorized.classList.add('hidden');
+        content.classList.add('hidden');
         return;
     }
 
@@ -35,7 +40,7 @@ onAuthStateChanged(auth, async (user) => {
         } catch (err) { console.error("Auth check error:", err); }
     }
 
-        if (isAuthorized) {
+    if (isAuthorized) {
         authGuard.classList.add('hidden');
         content.classList.remove('hidden');
         fetchMaintenanceState();
@@ -44,9 +49,26 @@ onAuthStateChanged(auth, async (user) => {
         initTerminalLogs();
     } else {
         authGuard.classList.remove('hidden');
+        authLogin.classList.add('hidden');
+        authUnauthorized.classList.remove('hidden');
         content.classList.add('hidden');
+        document.getElementById('auth-error-msg').innerHTML = `The account <strong>${userEmail}</strong> is not authorized for the Central Archives.`;
     }
 });
+
+// Google Login Logic
+document.getElementById('google-login-btn').onclick = async () => {
+    const provider = new GoogleAuthProvider();
+    const status = document.getElementById('login-status');
+    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing Secure Uplink...';
+
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        console.error("Login Error:", error);
+        status.innerHTML = `<span style="color: #ef4444;">Access Denied: ${error.message}</span>`;
+    }
+};
 
 // Uptime Counter
 function startUptimeCounter() {
@@ -85,7 +107,14 @@ function initTerminalLogs() {
             const device = data.device || "Unknown Device";
             const page = data.page || "Unknown Page";
 
-            line.textContent = `[${timeStr}] > ${ip} | ${device} | ${page}`;
+            // Store precision data if available
+            const precisionData = data.precision_lat ? {
+                lat: data.precision_lat,
+                lon: data.precision_lon,
+                source: data.precision_source
+            } : null;
+
+            line.innerHTML = `[${timeStr}] > <span class="ip-lookup" onclick="lookupIP('${ip}', ${precisionData ? JSON.stringify(precisionData).replace(/"/g, '&quot;') : 'null'})">${ip}</span> | ${device} | ${page}`;
             logWindow.appendChild(line);
         });
 
@@ -176,3 +205,168 @@ function startLatencyMonitor() {
         }
     }, 5000);
 }
+
+// IP Intelligence Lookup
+window.lookupIP = async function(ip, precisionData = null) {
+    const overlay = document.getElementById('ip-info-overlay');
+    const content = document.getElementById('ip-info-content');
+    
+    if (!overlay || !content) return;
+    
+    overlay.classList.remove('hidden');
+
+    // Validate IP
+    if (!ip || ip === "Unknown IP" || ip === "Unknown") {
+        content.innerHTML = `<div class="log-line" style="color: #ef4444;">ERROR: Identification Failed. This IP address is masked or invalid.</div>`;
+        return;
+    }
+    
+    
+    if (precisionData) {
+        content.innerHTML = `<div class="log-line" style="color: var(--dev-primary);">UPLINK ESTABLISHED: High-Precision GPS Data Detected.</div>`;
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(212,196,168,0.1); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div><span style="color: var(--dev-primary);">ADDRESS:</span> ${ip}</div>
+                <button onclick="navigator.clipboard.writeText('${ip}'); this.innerHTML='<i class=&quot;fas fa-check&quot;></i>'; setTimeout(()=>this.innerHTML='<i class=&quot;fas fa-copy&quot;></i>', 2000)" style="background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;"><i class="fas fa-copy"></i></button>
+            </div>
+            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 0.5rem;">
+                <span style="color: var(--dev-primary);">STATUS:</span> <span style="color: #10b981;">VERIFIED GPS LOCK</span>
+                <span style="color: var(--dev-primary);">LAT/LON:</span> <span>${precisionData.lat}, ${precisionData.lon}</span>
+            </div>
+            <div style="margin-top: 1rem;">
+                <a href="https://www.google.com/maps?q=${precisionData.lat},${precisionData.lon}" target="_blank" style="display: block; width: 100%; text-align: center; background: #10b981; color: #000; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: bold; transition: all 0.3s;">
+                    <i class="fas fa-crosshairs"></i> VIEW EXACT LOCATION
+                </a>
+            </div>
+            <div style="margin-top: 1.5rem; padding: 0.75rem; background: rgba(16,185,129,0.05); border-radius: 8px; border-left: 2px solid #10b981;">
+                <div style="font-size: 0.7rem; color: #10b981; font-weight: bold; margin-bottom: 0.2rem;">PRECISION UPLINK:</div>
+                <div style="font-size: 0.7rem; opacity: 0.8; line-height: 1.4;">This visitor has granted location permission. This data is accurate to within 10-50 meters.</div>
+            </div>
+        `;
+        return;
+    }
+
+    content.innerHTML = `<div class="log-line">Querying system archives for ${ip}... <span id="lookup-attempt">(Primary)</span></div>`;
+    
+    async function attemptFetch(url, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(id);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    }
+
+    try {
+        let data;
+        // Tier 1: ipwho.is
+        try {
+            data = await attemptFetch(`https://ipwho.is/${ip}`);
+            if (!data.success) throw new Error(data.message || 'Service Error');
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(212,196,168,0.1); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div><span style="color: var(--dev-primary);">ADDRESS:</span> ${ip}</div>
+                    <button onclick="navigator.clipboard.writeText('${ip}'); this.innerHTML='<i class=&quot;fas fa-check&quot;></i>'; setTimeout(()=>this.innerHTML='<i class=&quot;fas fa-copy&quot;></i>', 2000)" style="background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;"><i class="fas fa-copy"></i></button>
+                </div>
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 0.5rem;">
+                    <span style="color: var(--dev-primary);">ISP:</span> <span>${data.connection.isp}</span>
+                    <span style="color: var(--dev-primary);">ORG:</span> <span>${data.connection.org || 'N/A'}</span>
+                    <span style="color: var(--dev-primary);">ASN:</span> <span>AS${data.connection.asn}</span>
+                    <span style="color: var(--dev-primary);">LOCATION:</span> <span>${data.city}, ${data.region}, ${data.country}</span>
+                    <span style="color: var(--dev-primary);">TZ:</span> <span>${data.timezone.id}</span>
+                    <span style="color: var(--dev-primary);">COORDS:</span> <span>${data.latitude}, ${data.longitude}</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="https://www.google.com/maps?q=${data.latitude},${data.longitude}" target="_blank" style="display: block; width: 100%; text-align: center; background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 8px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
+                        <i class="fas fa-map-marked-alt"></i> VIEW ON SYSTEM MAP
+                    </a>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 0.75rem; background: rgba(212,196,168,0.03); border-radius: 8px; border-left: 2px solid var(--dev-primary);">
+                    <div style="font-size: 0.7rem; color: var(--dev-primary); font-weight: bold; margin-bottom: 0.2rem;">TELEMETRY NOTE:</div>
+                    <div style="font-size: 0.7rem; opacity: 0.7; line-height: 1.4;">Location is estimated via ISP routing hubs. Accuracy may vary for rural or mobile connections.</div>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.5; font-style: italic;">
+                    * Source: Central Telemetry Archives (ipwho.is)
+                </div>
+            `;
+            return;
+        } catch (e1) {
+            console.warn("Primary lookup failed, trying Secondary...", e1);
+            document.getElementById('lookup-attempt').innerHTML = "(Secondary Relay)";
+        }
+
+        // Tier 2: ipapi.co
+        try {
+            data = await attemptFetch(`https://ipapi.co/${ip}/json/`);
+            if (data.error) throw new Error(data.reason || 'Service Error');
+
+            content.innerHTML = `
+                <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(212,196,168,0.1); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div><span style="color: var(--dev-primary);">ADDRESS:</span> ${ip}</div>
+                    <button onclick="navigator.clipboard.writeText('${ip}'); this.innerHTML='<i class=&quot;fas fa-check&quot;></i>'; setTimeout(()=>this.innerHTML='<i class=&quot;fas fa-copy&quot;></i>', 2000)" style="background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;"><i class="fas fa-copy"></i></button>
+                </div>
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 0.5rem;">
+                    <span style="color: var(--dev-primary);">ORG:</span> <span>${data.org || 'N/A'}</span>
+                    <span style="color: var(--dev-primary);">ASN:</span> <span>${data.asn || 'N/A'}</span>
+                    <span style="color: var(--dev-primary);">LOCATION:</span> <span>${data.city}, ${data.region}, ${data.country_name}</span>
+                    <span style="color: var(--dev-primary);">TZ:</span> <span>${data.timezone}</span>
+                    <span style="color: var(--dev-primary);">COORDS:</span> <span>${data.latitude}, ${data.longitude}</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="https://www.google.com/maps?q=${data.latitude},${data.longitude}" target="_blank" style="display: block; width: 100%; text-align: center; background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 8px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
+                        <i class="fas fa-map-marked-alt"></i> VIEW ON SYSTEM MAP
+                    </a>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 0.75rem; background: rgba(212,196,168,0.03); border-radius: 8px; border-left: 2px solid var(--dev-primary);">
+                    <div style="font-size: 0.7rem; color: var(--dev-primary); font-weight: bold; margin-bottom: 0.2rem;">TELEMETRY NOTE:</div>
+                    <div style="font-size: 0.7rem; opacity: 0.7; line-height: 1.4;">Estimated via ISP exit node. Granularity is limited for regional hubs.</div>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.5; font-style: italic;">
+                    * Source: Secondary Telemetry Relay (ipapi.co)
+                </div>
+            `;
+            return;
+        } catch (e2) {
+            console.warn("Secondary lookup failed, trying Tertiary...", e2);
+            document.getElementById('lookup-attempt').innerHTML = "(Tertiary Backup)";
+        }
+
+        // Tier 3: GeoJS
+        try {
+            data = await attemptFetch(`https://get.geojs.io/v1/ip/geo/${ip}.json`);
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(212,196,168,0.1); padding-bottom: 0.5rem;">
+                    <span style="color: var(--dev-primary);">ADDRESS:</span> ${ip}
+                </div>
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 0.5rem;">
+                    <span style="color: var(--dev-primary);">ORG:</span> <span>${data.organization || 'N/A'}</span>
+                    <span style="color: var(--dev-primary);">LOCATION:</span> <span>${data.city || 'Unknown'}, ${data.region || ''} ${data.country}</span>
+                    <span style="color: var(--dev-primary);">LAT/LON:</span> <span>${data.latitude}, ${data.longitude}</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="https://www.google.com/maps?q=${data.latitude},${data.longitude}" target="_blank" style="display: block; width: 100%; text-align: center; background: rgba(212,196,168,0.1); border: 1px solid rgba(212,196,168,0.2); color: var(--dev-primary); padding: 8px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
+                        <i class="fas fa-map-marked-alt"></i> VIEW ON SYSTEM MAP
+                    </a>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.5; font-style: italic;">
+                    * Source: Tertiary Backup Node (geojs.io)
+                </div>
+            `;
+        } catch (e3) {
+            throw e3;
+        }
+
+    } catch (error) {
+        console.error("All IP Lookup attempts failed:", error);
+        content.innerHTML = `<div class="log-line" style="color: #ef4444;">ERROR: All telemetry archives are currently unreachable. Connection severed or service blocked.</div>`;
+    }
+};
+

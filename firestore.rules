@@ -107,7 +107,8 @@ service cloud.firestore {
 
     match /visitor_logs/{docId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow update: if true; // Allow visitors to add GPS data to their created log
+      allow read, delete: if isAdmin();
     }
 
     // --- CATCH-ALL ---

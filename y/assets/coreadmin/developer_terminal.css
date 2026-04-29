@@ -517,11 +517,26 @@ body.developer-terminal {
 }
 
 .log-line::before {
-    content: 'â€º';
+    content: '›';
     color: rgba(212, 196, 168,0.6);
     font-size: 0.9rem;
     margin-top: -0.05rem;
     flex-shrink: 0;
+}
+
+.ip-lookup {
+    color: var(--dev-primary);
+    cursor: pointer;
+    border-bottom: 1px dashed rgba(212, 196, 168, 0.3);
+    transition: all 0.2s ease;
+}
+
+.ip-lookup:hover {
+    color: var(--dev-primary-light);
+    border-bottom-color: var(--dev-primary);
+    background: rgba(212, 196, 168, 0.1);
+    padding: 0 2px;
+    border-radius: 2px;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â• DIAGNOSTIC CARDS â•â•â•â•â•â•â•â•â•â•â• */
