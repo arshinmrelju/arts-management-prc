@@ -275,7 +275,7 @@
       display: flex;
       justify-content: center;
       gap: 0.5rem;
-      margin-bottom: 4rem;
+      margin-bottom: 2.5rem;
       position: sticky;
       top: 6rem;
       z-index: 100;
@@ -1103,142 +1103,123 @@
 
     @media (max-width: 768px) {
       main {
-        padding: 6rem 1rem 4rem;
+        padding: 8rem 1rem 4rem !important;
       }
 
       .hero-title {
-        font-size: 2.2rem;
-        margin-top: 0.5rem;
-        letter-spacing: -0.5px;
+        font-size: 2rem !important;
       }
 
       .hero-subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 2.5rem;
-        opacity: 0.8;
+        font-size: 0.85rem !important;
+        margin-bottom: 1.5rem !important;
       }
 
-      .podium-area {
-        display: grid;
-        grid-template-columns: 1fr 1.2fr 1fr;
-        align-items: flex-end;
-        gap: 0.5rem;
-        margin: 2rem auto 4rem;
-        padding: 0;
-        max-width: 100%;
+      .view-toggle {
+        margin-bottom: 1.5rem !important;
+      }
+
+      .search-container {
+        margin-bottom: 1.5rem !important;
+      }
+
+      /* Make Podium Look Like the Rest of the Leaderboard on Mobile */
+      .podium-area,
+      .leaderboard-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
+        margin: 0 auto 0.75rem auto !important;
+        padding: 0 !important;
       }
 
       .podium-rank {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
-        width: 100%;
-        position: relative;
+        width: 100% !important;
+        margin: 0 !important;
+        display: block !important;
       }
 
-      /* Staggered Heights for Mobile Podium */
-      .podium-rank.rank-1-box {
-        order: 2;
-        padding-bottom: 1.5rem; /* Lift 1st place */
-      }
-      .podium-rank.rank-2-box {
-        order: 1;
-        padding-bottom: 0.5rem;
-      }
-      .podium-rank.rank-3-box {
-        order: 3;
-        padding-bottom: 0;
-      }
+      /* Order 1st, 2nd, 3rd top to bottom */
+      .podium-rank.rank-1-box { order: 1 !important; padding: 0 !important; }
+      .podium-rank.rank-2-box { order: 2 !important; padding: 0 !important; }
+      .podium-rank.rank-3-box { order: 3 !important; padding: 0 !important; }
 
-      .podium-rank .rank-card {
-        padding: 1rem 0.5rem !important;
-        border-radius: 1rem !important;
-        background: rgba(15, 20, 35, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        height: auto !important;
-        min-height: 140px;
-        justify-content: flex-start !important;
-      }
-
-      .podium-rank.rank-1-box .rank-card {
-        background: linear-gradient(145deg, rgba(40, 35, 15, 0.8), rgba(20, 15, 30, 0.9));
-        border-color: rgba(251, 191, 36, 0.3);
-      }
-
-      .podium-rank .rank-badge {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 1rem !important;
-        margin-bottom: 0.5rem !important;
-      }
-
-      .podium-rank .dept-info {
-        text-align: center;
-        width: 100%;
-      }
-
-      .podium-rank .dept-name {
-        font-size: 0.7rem !important;
-        font-weight: 600 !important;
-        margin-bottom: 0.4rem !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 3 !important;
-        line-clamp: 3 !important;
-        -webkit-box-orient: vertical !important;
-        overflow: hidden !important;
-        min-height: 2.1rem;
-        line-height: 0.7rem !important;
-      }
-
-      .podium-rank .dept-score {
-        font-size: 1.25rem !important;
-        font-weight: 800 !important;
-      }
-
-      /* Non-podium items */
-      .leaderboard-grid {
-        gap: 0.75rem;
-      }
-
+      .podium-rank .rank-card,
       .leaderboard-grid .rank-card {
-        flex-direction: row !important;
-        padding: 0.75rem 1rem !important;
+        padding: 1rem !important;
         border-radius: 1rem !important;
-        gap: 1rem !important;
+        min-height: auto !important;
+        height: auto !important;
       }
 
-      .leaderboard-grid .rank-badge {
-        width: 38px !important;
-        height: 38px !important;
-        font-size: 0.9rem !important;
-      }
-
-      .leaderboard-grid .dept-info {
+      /* Uniform list row layout */
+      .podium-rank .rank-card-header,
+      .leaderboard-grid .rank-card-header {
         display: flex !important;
         flex-direction: row !important;
-        justify-content: space-between !important;
         align-items: center !important;
-        flex: 1;
+        gap: 0.75rem !important;
+        width: 100% !important;
+        text-align: left !important;
       }
 
-      .leaderboard-grid .dept-name {
-        font-size: 0.85rem !important;
-        max-width: 65%;
-        margin-bottom: 0 !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .leaderboard-grid .dept-score {
+      .podium-rank .rank-badge,
+      .leaderboard-grid .rank-badge {
+        width: 40px !important;
+        height: 40px !important;
         font-size: 1.1rem !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
       }
 
-      .leaderboard-grid .dept-score span {
+      .podium-rank .dept-info,
+      .leaderboard-grid .dept-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        text-align: left !important;
+      }
+
+      .podium-rank .dept-name,
+      .leaderboard-grid .dept-name {
+        font-size: 0.95rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin-bottom: 4px !important;
+      }
+
+      .podium-rank .dept-score,
+      .leaderboard-grid .dept-score {
+        font-size: 1.25rem !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: baseline !important;
+        gap: 2px !important;
+        justify-content: flex-end !important;
+      }
+
+      .podium-rank .dept-score span:last-child,
+      .leaderboard-grid .dept-score span:last-child {
         font-size: 0.6rem !important;
-        margin-left: 2px !important;
+      }
+
+      .podium-rank .progress-container,
+      .leaderboard-grid .progress-container {
+        display: block !important;
+      }
+
+      .trend-indicator {
+        display: none !important;
+      }
+
+      .expand-icon {
+        font-size: 0.8rem !important;
+        margin-left: 0.25rem !important;
+        margin-top: 0 !important;
       }
     }
 
@@ -1246,6 +1227,162 @@
       to {
         transform: rotate(360deg);
       }
+    }
+
+    /* Search Bar */
+    .search-container {
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 1rem 3.5rem 1rem 3.5rem;
+      border-radius: 100px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .search-container input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .clear-search {
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .clear-search:hover {
+      color: white;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin-top: 0.8rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #d946ef);
+      border-radius: 10px;
+      width: 0%;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+    }
+
+    .rank-1 .progress-bar { background: linear-gradient(90deg, #fde047, #f59e0b); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+    .rank-2 .progress-bar { background: linear-gradient(90deg, #e2e8f0, #94a3b8); box-shadow: 0 0 10px rgba(148, 163, 184, 0.5); }
+    .rank-3 .progress-bar { background: linear-gradient(90deg, #fdba74, #ea580c); box-shadow: 0 0 10px rgba(234, 88, 12, 0.5); }
+
+    /* Trend Indicator */
+    .trend-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+    
+    .trend-up {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .trend-down {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Expandable Content */
+    .expandable-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+      opacity: 0;
+    }
+
+    .rank-card.expanded {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .rank-card.expanded .expandable-content {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .expandable-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.8rem;
+    }
+    
+    .expand-icon {
+      color: var(--text-secondary);
+      transition: transform 0.3s;
+    }
+    
+    .expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    
+    .podium-rank .rank-card-header {
+      flex-direction: column !important;
+      text-align: center;
+      gap: 1rem !important;
+    }
+    
+    .podium-rank .dept-info {
+      width: 100%;
+    }
+    
+    .podium-rank .trend-indicator {
+      display: none;
+    }
+    
+    .podium-rank .expand-icon {
+      margin-top: 0.5rem;
     }
   </style>
 </head>
@@ -1304,6 +1441,11 @@
     </div>
 
     <div id="dept-view">
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="dept-search" placeholder="Search departments..." oninput="filterDepartments()">
+        <i class="fas fa-times clear-search" id="clear-search" onclick="clearSearch()" style="display: none;"></i>
+      </div>
       <div id="podium-container" class="podium-area"></div>
       <div id="leaderboard-container" class="leaderboard-grid"></div>
     </div>
@@ -1388,6 +1530,128 @@
       link.addEventListener('click', toggleMobileNav);
     });
 
+    window.filterDepartments = () => {
+      const input = document.getElementById('dept-search');
+      const clearBtn = document.getElementById('clear-search');
+      const query = input.value.toLowerCase();
+      
+      if (clearBtn) {
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+      }
+
+      const cards = document.querySelectorAll('.leaderboard-grid .rank-card, .podium-area .podium-rank');
+      cards.forEach(card => {
+        const deptNameEl = card.querySelector('.dept-name');
+        if(deptNameEl) {
+          const deptName = deptNameEl.textContent.toLowerCase();
+          if (deptName.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        }
+      });
+    };
+
+    window.clearSearch = () => {
+      const input = document.getElementById('dept-search');
+      if (input) {
+        input.value = '';
+        window.filterDepartments();
+        input.focus();
+      }
+    };
+
+    const animateCounters = () => {
+      const counters = document.querySelectorAll('.counter');
+      counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        if (target === 0) return;
+        const duration = 1500;
+        const stepTime = Math.max(10, Math.floor(duration / target));
+        let current = 0;
+        
+        const timer = setInterval(() => {
+          current += Math.max(1, Math.ceil(target / 50));
+          if (current >= target) {
+            counter.innerText = target;
+            clearInterval(timer);
+          } else {
+            counter.innerText = current;
+          }
+        }, stepTime);
+      });
+      
+      setTimeout(() => {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+          bar.style.width = bar.getAttribute('data-width');
+        });
+      }, 100);
+    };
+
+    window.toggleExpand = async (event, deptId, deptName) => {
+      const card = event.currentTarget;
+      const content = card.querySelector('.expandable-content');
+      const itemsContainer = card.querySelector('.expand-items');
+      const loader = card.querySelector('.expand-loader');
+      
+      const isExpanded = card.classList.contains('expanded');
+      
+      if (!isExpanded) {
+        card.classList.add('expanded');
+        if (itemsContainer.innerHTML === '') {
+          loader.style.display = 'block';
+          try {
+            const q = query(collection(db, "score_logs"),
+              where("department", "==", deptName),
+              where("academicYear", "==", systemYear)
+            );
+            const querySnapshot = await getDocs(q);
+            
+            let html = '';
+            if (querySnapshot.empty) {
+              html = '<div style="color: #94a3b8; font-size: 0.9rem; grid-column: 1/-1; text-align: center;">No recent item wins found.</div>';
+            } else {
+              const logs = [];
+              querySnapshot.forEach(doc => logs.push(doc.data()));
+              logs.sort((a, b) => (b.timestamp ? new Date(b.timestamp).getTime() : 0) - (a.timestamp ? new Date(a.timestamp).getTime() : 0));
+              
+              logs.slice(0, 6).forEach(log => {
+                let posClass = 'color: var(--text-secondary);';
+                if (log.position === '1st' || log.position === '1') posClass = 'color: #fbbf24; font-weight: bold;';
+                else if (log.position === '2nd' || log.position === '2') posClass = 'color: #94a3b8; font-weight: bold;';
+                else if (log.position === '3rd' || log.position === '3') posClass = 'color: #d97706; font-weight: bold;';
+                
+                html += `
+                  <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                    <div style="float: right; text-align: right;">
+                      <div style="color: #fbbf24; font-weight: bold;">+${log.points || 0} pts</div>
+                      <div style="font-size: 0.75rem; ${posClass}">${log.position || '-'}</div>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">${log.itemName || 'Item'}</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">${log.studentName || 'Multiple'}</div>
+                  </div>
+                `;
+              });
+              if (logs.length > 6) {
+                html += `<div style="grid-column: 1/-1; text-align: center; margin-top: 0.5rem;"><button onclick="event.stopPropagation(); openDetails('${deptName.replace(/'/g, "\\'")}')" style="background: transparent; border: 1px solid var(--accent-color); color: var(--text-primary); padding: 0.5rem 1.5rem; border-radius: 100px; cursor: pointer; font-family: var(--font-body); font-size: 0.9rem; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'" onmouseout="this.style.background='transparent'">View All & Analytics</button></div>`;
+              } else {
+                 html += `<div style="grid-column: 1/-1; text-align: center; margin-top: 0.5rem;"><button onclick="event.stopPropagation(); openDetails('${deptName.replace(/'/g, "\\'")}')" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-secondary); padding: 0.4rem 1rem; border-radius: 100px; cursor: pointer; font-family: var(--font-body); font-size: 0.8rem; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='var(--text-secondary)';"><i class="fas fa-chart-line" style="margin-right: 5px;"></i> Analytics</button></div>`;
+              }
+            }
+            itemsContainer.innerHTML = html;
+          } catch(err) {
+            console.error(err);
+            itemsContainer.innerHTML = '<div style="color: #ef4444; font-size: 0.9rem; grid-column: 1/-1; text-align: center;">Failed to load items.</div>';
+          }
+          loader.style.display = 'none';
+        }
+      } else {
+        card.classList.remove('expanded');
+      }
+    };
+
     // Fetch system year first
     async function init() {
       try {
@@ -1443,6 +1707,7 @@
 
         let podiumHtml = '';
         let gridHtml = '';
+        const maxScore = filteredData.length > 0 ? filteredData[0].score : 1;
 
         filteredData.forEach((data, index) => {
           const rank = index + 1;
@@ -1465,12 +1730,33 @@
             rankClass = 'rank-3';
           }
 
+          const deptSafe = (data.department || data.id).replace(/'/g, "\\'");
+          const deptIdSafe = data.id.replace(/'/g, "\\'").replace(/[^a-zA-Z0-9]/g, '');
+          const trendHtml = score > 0 ? `<div class="trend-indicator trend-up"><i class="fas fa-arrow-trend-up"></i></div>` : `<div class="trend-indicator trend-down" style="color: #94a3b8; background: transparent;"><i class="fas fa-minus"></i></div>`;
+          const widthPct = maxScore > 0 ? (score / maxScore) * 100 : 0;
+
           const cardHtml = `
-            <div class="rank-card ${rankClass}" onclick="openDetails('${(data.department || data.id).replace(/'/g, "\\'")}')" style="animation: dropIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${index * 0.08}s both;">
-              <div class="rank-badge">${rankIcon}</div>
-              <div class="dept-info">
-                <div class="dept-name">${data.department || data.id}</div>
-                <div class="dept-score">${score} <span>pts</span></div>
+            <div class="rank-card ${rankClass}" onclick="toggleExpand(event, '${deptIdSafe}', '${deptSafe}')" style="animation: dropIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${index * 0.08}s both; flex-direction: column; align-items: stretch; gap: 0;">
+              <div class="rank-card-header" style="display: flex; width: 100%; align-items: center; gap: 1.5rem; cursor: pointer; text-align: left;">
+                <div class="rank-badge">${rankIcon}</div>
+                <div class="dept-info">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <h3 class="dept-name" style="margin: 0; font-size: 1.1rem; color: white;">${data.department || data.id}</h3>
+                    ${trendHtml}
+                  </div>
+                  <div class="progress-container">
+                    <div class="progress-bar" style="width: 0%" data-width="${widthPct}%"></div>
+                  </div>
+                </div>
+                <div class="dept-score" style="display: flex; align-items: baseline; justify-content: flex-end; gap: 4px; font-size: 1.75rem;">
+                  <span class="counter" data-target="${score}">0</span> 
+                  <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">pts</span>
+                </div>
+                <i class="fas fa-chevron-down expand-icon" style="color: var(--text-secondary); margin-left: 0.5rem;"></i>
+              </div>
+              <div class="expandable-content" id="expand-${deptIdSafe}" onclick="event.stopPropagation()">
+                <div class="expand-loader" style="display: none; text-align: center; color: #94a3b8; padding: 1rem;"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>
+                <div class="expand-items expandable-grid"></div>
               </div>
             </div>
           `;
@@ -1484,6 +1770,8 @@
 
         podiumArea.innerHTML = podiumHtml;
         container.innerHTML = gridHtml;
+        
+        setTimeout(animateCounters, 100);
       });
 
       // 2. Individual Item Winners Listener
