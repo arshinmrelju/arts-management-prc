@@ -385,8 +385,8 @@ body.developer-terminal {
     font-size: 0.65rem;
     font-weight: 800;
     letter-spacing: 0.12em;
-    color: var(--dev-accent);
-    text-shadow: none;
+    color: #10b981;
+    text-shadow: 0 0 10px rgba(16,185,129,0.3);
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -542,9 +542,13 @@ body.developer-terminal {
 /* â•â•â•â•â•â•â•â•â•â•â• DIAGNOSTIC CARDS â•â•â•â•â•â•â•â•â•â•â• */
 .diag-group {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    grid-column: 1 / -1;
+    margin-bottom: 2.5rem;
+}
+
+@media (max-width: 1200px) {
+    .diag-group { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
@@ -585,19 +589,20 @@ body.developer-terminal {
 .diag-icon {
     font-size: 1.4rem;
     color: var(--dev-primary);
-    text-shadow: none;
-    opacity: 0.85;
+    text-shadow: 0 0 15px rgba(212, 196, 168, 0.4);
+    opacity: 0.9;
 }
 
-.diag-info { display: flex; flex-direction: column; gap: 0.35rem; }
+.diag-info { display: flex; flex-direction: column; gap: 0.45rem; }
 
 .diag-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: rgba(148,163,184,0.75);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--dev-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-family: 'Cinzel', serif;
+    letter-spacing: 0.15em;
+    font-family: 'Inter', sans-serif;
+    opacity: 0.8;
 }
 
 .diag-value {
@@ -884,7 +889,6 @@ body.developer-terminal {
     border: 1px solid rgba(212, 196, 168,0.25);
     border-radius: 2rem;
     padding: 0.1rem 0.45rem;
-    animation: pulse 2s infinite;
 }
 
 /* Route */

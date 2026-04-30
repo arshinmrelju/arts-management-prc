@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, setDoc, serverTimestamp, collection, query, orderBy, limit, onSnapshot, getCountFromServer, where, Timestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { firebaseConfig } from "../core/firebase-config.js";
 
@@ -47,6 +47,7 @@ onAuthStateChanged(auth, async (user) => {
         startLatencyMonitor();
         startUptimeCounter();
         initTerminalLogs();
+        initAnalytics();
     } else {
         authGuard.classList.remove('hidden');
         authLogin.classList.add('hidden');
@@ -119,10 +120,100 @@ function initTerminalLogs() {
         });
 
         logWindow.scrollTop = logWindow.scrollHeight;
+        
+        // Refresh analytics on new logs (throttled by snapshot frequency)
+        if (typeof refreshAnalytics === 'function') refreshAnalytics();
     }, (error) => {
         console.error("Error fetching visitor logs:", error);
         logWindow.innerHTML = '<div class="log-line" style="color: red;">Error: Archive connection severed.</div>';
     });
+}
+
+// Analytics Logic
+async function initAnalytics() {
+    refreshAnalytics();
+    // Refresh every 30 seconds for live feel
+    setInterval(refreshAnalytics, 30000);
+}
+
+async function refreshAnalytics() {
+    try {
+        const logsCol = collection(db, "visitor_logs");
+        const allSnap = await getDocs(logsCol);
+        
+        const allIPs = new Set();
+        const todayIPs = new Set();
+        const monthIPs = new Set();
+        const monthIPVisits = {}; 
+        const pageCounts = {};
+        
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+        allSnap.forEach(doc => {
+            const data = doc.data();
+            const ip = data.ip;
+            const ts = data.timestamp ? data.timestamp.toMillis() : 0;
+            const page = data.page || 'index.html';
+
+            if (ip) {
+                allIPs.add(ip);
+                if (ts >= todayStart) {
+                    todayIPs.add(ip);
+                }
+                if (ts >= monthStart) {
+                    monthIPs.add(ip);
+                    monthIPVisits[ip] = (monthIPVisits[ip] || 0) + 1;
+                }
+            }
+            
+            pageCounts[page] = (pageCounts[page] || 0) + 1;
+        });
+
+        const totalUnique = allIPs.size;
+        const todayUnique = todayIPs.size;
+        const monthUnique = monthIPs.size;
+
+        // 2. Update UI
+        document.getElementById('total-visitor-count').textContent = totalUnique.toLocaleString();
+        document.getElementById('total-visitor-badge').textContent = `${totalUnique.toLocaleString()} ${totalUnique === 1 ? 'VISITOR' : 'VISITORS'}`;
+        
+        // Progress bar (goal of 1000 unique)
+        const totalProgress = Math.min((totalUnique / 1000) * 100, 100);
+        document.getElementById('total-visitor-bar').style.width = `${totalProgress}%`;
+
+        document.getElementById('today-visitor-count').textContent = todayUnique.toLocaleString();
+        document.getElementById('today-visitor-bar').style.width = `${Math.min((todayUnique / 50) * 100, 100)}%`;
+
+        document.getElementById('month-visitor-count').textContent = monthUnique.toLocaleString();
+        document.getElementById('month-visitor-bar').style.width = `${Math.min((monthUnique / 500) * 100, 100)}%`;
+
+        // 3. Top IP (Operative)
+        let topIP = 'N/A';
+        let maxIPVisits = 0;
+        for (const [ip, visits] of Object.entries(monthIPVisits)) {
+            if (visits > maxIPVisits) {
+                maxIPVisits = visits;
+                topIP = ip;
+            }
+        }
+        document.getElementById('top-visitor-ip').textContent = topIP;
+
+        // 4. Top Destination
+        let topPage = 'N/A';
+        let maxCount = 0;
+        for (const [page, count] of Object.entries(pageCounts)) {
+            if (count > maxCount) {
+                maxCount = count;
+                topPage = page;
+            }
+        }
+        document.getElementById('top-page-name').textContent = topPage;
+        
+    } catch (err) {
+        console.error("Analytics Error:", err);
+    }
 }
 
 // Maintenance Mode Logic

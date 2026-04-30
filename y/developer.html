@@ -88,6 +88,74 @@
                     </div>
                 </section>
 
+                <!-- Diagnostics (Top Tier Analytics) -->
+                <div class="diag-group" style="margin-bottom: 2rem;">
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-users"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Total Visitors</span>
+                            <span class="diag-value" id="total-visitor-count">--</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" id="total-visitor-bar" style="width: 0%; background: linear-gradient(90deg,#8b5cf6,#a78bfa); box-shadow: 0 0 12px rgba(139,92,246,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-calendar-day"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Visitors Today</span>
+                            <span class="diag-value" id="today-visitor-count">--</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" id="today-visitor-bar" style="width: 0%; background: linear-gradient(90deg,#f43f5e,#fb7185); box-shadow: 0 0 12px rgba(244,63,94,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Monthly Visitors</span>
+                            <span class="diag-value" id="month-visitor-count">--</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" id="month-visitor-bar" style="width: 0%; background: linear-gradient(90deg,#f59e0b,#fbbf24); box-shadow: 0 0 12px rgba(245,158,11,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-user-secret"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Top Operative</span>
+                            <span class="diag-value" id="top-visitor-ip" style="font-size: 0.85rem;">--</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#10b981,#34d399); box-shadow: 0 0 12px rgba(16,185,129,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-compass"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Top Destination</span>
+                            <span class="diag-value" id="top-page-name" style="font-size: 0.9rem;">--</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#0ea5e9,#38bdf8); box-shadow: 0 0 12px rgba(14,165,233,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Network Latency</span>
+                            <span class="diag-value" id="dev-latency">-- ms</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" style="width: 65%; background: linear-gradient(90deg,#3b82f6,#6366f1); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-database"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Database Uptime</span>
+                            <span class="diag-value">99.99% (V1)</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" style="width: 99%; background: linear-gradient(90deg,#10b981,#34d399); box-shadow: 0 0 12px rgba(16,185,129,0.5);"></div></div>
+                    </div>
+                    <div class="diag-card">
+                        <div class="diag-icon"><i class="fas fa-globe-asia"></i></div>
+                        <div class="diag-info">
+                            <span class="diag-label">Service Region</span>
+                            <span class="diag-value">ASIA-SOUTH1</span>
+                        </div>
+                        <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#f5c842,#b8922e); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
+                    </div>
+                </div>
+
                 <div class="dev-grid">
                     <!-- System Gate -->
                     <div class="glass-card maintenance-card">
@@ -121,6 +189,7 @@
                                     <div class="icon-box"><i class="fas fa-scroll"></i></div>
                                     <h3>Visitor Ledger</h3>
                                 </div>
+                                <span class="badge-active" id="total-visitor-badge">-- VISITORS</span>
                             </div>
                             <div class="terminal-log-window" id="log-window">
                                 <div class="log-line">Initializing telemetry feed...</div>
@@ -128,33 +197,6 @@
                         </div>
                     </div>
 
-                    <!-- Diagnostics -->
-                    <div class="diag-group">
-                        <div class="diag-card">
-                            <div class="diag-icon"><i class="fas fa-bolt"></i></div>
-                            <div class="diag-info">
-                                <span class="diag-label">Network Latency</span>
-                                <span class="diag-value" id="dev-latency">-- ms</span>
-                            </div>
-                            <div class="diag-bar"><div class="bar-fill" style="width: 65%; background: linear-gradient(90deg,#3b82f6,#6366f1); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
-                        </div>
-                        <div class="diag-card">
-                            <div class="diag-icon"><i class="fas fa-database"></i></div>
-                            <div class="diag-info">
-                                <span class="diag-label">Database Uptime</span>
-                                <span class="diag-value">99.99% (V1)</span>
-                            </div>
-                            <div class="diag-bar"><div class="bar-fill" style="width: 99%; background: linear-gradient(90deg,#10b981,#34d399); box-shadow: 0 0 12px rgba(16,185,129,0.5);"></div></div>
-                        </div>
-                        <div class="diag-card">
-                            <div class="diag-icon"><i class="fas fa-globe-asia"></i></div>
-                            <div class="diag-info">
-                                <span class="diag-label">Service Region</span>
-                                <span class="diag-value">ASIA-SOUTH1</span>
-                            </div>
-                            <div class="diag-bar"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg,#f5c842,#b8922e); box-shadow: 0 0 12px rgba(212,196,168,0.5);"></div></div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- ✦ Project Architecture -->
