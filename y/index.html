@@ -6817,6 +6817,16 @@
               processedBy: auth.currentUser.email
             });
 
+            // --- Automated SMS Notification ---
+            try {
+              const studentName = data.studentName || "Student";
+              const program = data.program || "the event";
+              const smsMessage = `Congratulations ${studentName}! Your registration for ${program} has been APPROVED. See you at the Arts Fest! - College Union PRC`;
+              window.smsService.send(data.phone, smsMessage);
+            } catch (smsErr) {
+              console.warn("SMS trigger failed:", smsErr);
+            }
+
             showCustomAlert("Approved!", "Registration has been approved and added to the official list.", "success");
           } catch (error) {
             console.error("Approval failed:", error);
@@ -8319,7 +8329,10 @@
             registrationsListener = onSnapshot(queryToUse, (snapshot) => {
               const registrations = [];
               snapshot.forEach((doc) => {
-                registrations.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                // Skip soft-deleted registrations (moved to recycle bin by admin)
+                if (data.isDeleted) return;
+                registrations.push({ id: doc.id, ...data });
               });
 
               // Sort by registeredAt date (newest first)
@@ -8798,6 +8811,7 @@
       console.log("UI identity not configured or failed to load:", err.message);
     });
   </script>
+  <script src="/assets/core/sms-service.js"></script>
   <script type="module" src="assets/core/analytics.js"></script>
 </body>
 

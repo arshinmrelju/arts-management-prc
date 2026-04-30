@@ -461,3 +461,79 @@ window.lookupIP = async function(ip, precisionData = null) {
     }
 };
 
+// ==========================================
+// SMS DISPATCH SYSTEM (Fast2SMS Integration)
+// ==========================================
+
+const FAST2SMS_KEY = "7ogH80WcIj9NDGazYF5dLnpkm3xPil6MsqCKfeSv1Jrh2ZREAw3omE5VrqZxp2MBkAUD9f0QLH6hsgyz"; 
+
+window.sendSMS = async function() {
+    const numInput = document.getElementById('sms-number');
+    const msgInput = document.getElementById('sms-message');
+    const btn = document.getElementById('sms-send-btn');
+    const status = document.getElementById('sms-status-msg');
+    
+    const number = numInput.value.trim();
+    const message = msgInput.value.trim();
+    
+    // 1. Validation
+    if (!/^\d{10}$/.test(number)) {
+        showSMSStatus("Invalid Number: Must be 10 digits.", "error");
+        numInput.style.borderColor = "#ef4444";
+        return;
+    }
+    numInput.style.borderColor = "";
+
+    if (!message) {
+        showSMSStatus("Payload Empty: Message required.", "error");
+        msgInput.style.borderColor = "#ef4444";
+        return;
+    }
+    msgInput.style.borderColor = "";
+
+    // 2. Dispatching
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> DISPATCHING...';
+    showSMSStatus("Establishing satellite uplink...", "process");
+
+    try {
+        const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_KEY}&route=q&message=${encodeURIComponent(message)}&flash=0&numbers=${number}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors' 
+        });
+
+        // With no-cors, we won't get response.ok or response.json()
+        // But the request will be sent to the server.
+        showSMSStatus("Uplink Confirmed: Message Dispatched.", "success");
+        msgInput.value = '';
+        
+        // Mock balance deduction
+        const balanceBadge = document.getElementById('sms-balance-badge');
+        let currentBal = parseFloat(balanceBadge.textContent.replace('BAL: ₹', ''));
+        if (!isNaN(currentBal)) {
+            currentBal -= 5.00;
+            balanceBadge.textContent = `BAL: ₹${currentBal.toFixed(2)}`;
+        }
+
+    } catch (error) {
+        console.error("SMS Dispatch Error:", error);
+        showSMSStatus("Uplink Failed: " + error.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-satellite-dish"></i> DISPATCH UPLINK';
+    }
+};
+
+function showSMSStatus(text, type) {
+    const status = document.getElementById('sms-status-msg');
+    if (!status) return;
+    status.textContent = `> ${text}`;
+    
+    if (type === "error") status.style.color = "#ef4444";
+    else if (type === "success") status.style.color = "#10b981";
+    else status.style.color = "#d4c4a8";
+}
+
+

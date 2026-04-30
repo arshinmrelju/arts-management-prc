@@ -1276,6 +1276,16 @@
 
         await addDoc(collection(db, "pending_registrations"), formData);
 
+        // --- Automated SMS Notification ---
+        try {
+          const studentName = formData.studentName || "Student";
+          const program = formData.program || "the event";
+          const smsMessage = `Dear ${studentName}, your registration for ${program} has been submitted successfully and is pending approval. - College Union PRC`;
+          window.smsService.send(formData.phone, smsMessage);
+        } catch (smsErr) {
+          console.warn("SMS trigger failed:", smsErr);
+        }
+
         // Show Success
         document.getElementById('registration-screen').classList.add('hidden');
         document.getElementById('success-screen').classList.remove('hidden');
@@ -1349,6 +1359,7 @@
     </div>
   </div>
 
+  <script src="/assets/core/sms-service.js"></script>
   <script type="module" src="/assets/core/analytics.js"></script>
 </body>
 
